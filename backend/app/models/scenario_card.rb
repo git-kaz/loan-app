@@ -9,15 +9,48 @@ class ScenarioCard < ApplicationRecord
     # 期間（年）を月数に変換
     months = period_years * 12
 
-    # 毎月の返済額を計算
-    payment = calculate_equal_payment(principal, months, initial_rate_sub)
+    # 当初固定金利の場合
+    if initial_fixed? && fixed_years.present? && subsequent_rate_sub.present?
+
+      # 当初固定期間の月数
+      fixed_months = fixed_years * 12
+      remaining_months = months - fixed_months
+
+      # 当初固定期間の返済額を計算
+      payment_initial = calculate_equal_payment(principal, months, initial_rate_sub)
+
+      # 当初固定期間終了後の返済額を計算
+      balance = principal # ループ用に元本を代入
+      r1 = initial_rate_sub / 120000.0 # 当初固定期間の月利
+
+      fixed_months.times do
+        interest = (balance * r1).floor
+        principal_payment = payment_initial - interest
+        balance -= principal_payment
+      end
+
+      # 固定期間終了後の返済額を残高より際計算
+      payment_after = calculate_equal_payment(balance, remaining_months, subsequent_rate_sub)
+
+      # 総返済額の算出（当初固定期間総額 + 固定期間後総額）
+      total = (payment_initial * fixed_months) + (payment_after * remaining_months)
+      {
+        monthly_payment_initial: payment_initial,
+        monthly_payment_after: payment_after,
+        total_payment: total  
+      }
+    else
+      # 毎月の返済額を計算
+      payment = calculate_equal_payment(principal, months, initial_rate_sub)
     
-    # フロントに渡すためにハッシュで返す
-    {
-      monthly_payment_initial: payment,
-      monthly_payment_after: payment, 
-      total_payment: payment * months
-    }
+      # フロントに渡すためにハッシュで返す
+      {
+        monthly_payment_initial: payment,
+        monthly_payment_after: payment, 
+        total_payment: payment * months
+      }
+    
+    end
   end
 
     private
@@ -36,7 +69,7 @@ class ScenarioCard < ApplicationRecord
       # 分母
       denominator = (1 + monthly_rate) ** months - 1
 
-      (numerator / denominator).round
+      (numerator / denominator).floor # 小数点以下切り捨て
     
     end
 end
