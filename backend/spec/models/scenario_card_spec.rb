@@ -48,5 +48,49 @@ RSpec.describe ScenarioCard, type: :model do
 
       end
     end
+
+    context '繰り上げ返済がある場合' do
+      let(:scenario_card) do
+        # DB保存が必要なためcreate!を使用
+        ScenarioCard.create!(
+          principal: 40_000_000, #4000万円
+          period_years: 35, #35年
+          repayment_type: 0, #元利均等
+          interest_type: 1, #全期間固定
+          initial_rate_sub: 70 #金利0.7% (70 bps)
+        )
+      end
+
+      context '期間短縮柄の場合' do
+        before do
+          scenario_card.prepayments.create!(
+            execution_year: 5,
+            amount: 1_000_000,
+            prepayment_type: 0 #期間短縮型
+          )
+        end
+
+        it '総返済額が減り、期間短縮効果が反映されること' do
+          result = scenario_card.calculate_schedule
+          expect(result[:total_payment]).to eq(44_881436)
+        end
+      end
+
+      context 'Y偏差医学軽減型の場合' do
+        before do
+          scenario_card.prepayments.create!(
+            execution_year: 5,
+            amount: 1_000_000,
+            prepayment_type: 1 #返済額軽減型
+          )
+        end
+
+        it '総返済額が減り、61ヶ月意向の返済額が軽減されること' do
+          result = scenario_card.calculate_schedule
+          expect(result[:total_payment]).to eq(45_002_000)
+          expect(result[:monthly_payment_after]).to eq(104_327)
+        end
+      end
+    end
   end
 end
