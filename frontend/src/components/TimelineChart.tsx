@@ -78,8 +78,9 @@ export default function TimelineChart() {
 
             {/* マウスホバー時のツールチップ */}
             <Tooltip
-              formatter={(value: number) => [
-                `${value.toLocaleString()}円`,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              formatter={(value: any) => [
+                value ? `${Number(value).toLocaleString()}円` : "0円",
                 "毎月返済額",
               ]}
               labelFormatter={(label) => `${label}年目`}
