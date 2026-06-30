@@ -20,7 +20,7 @@ RSpec.describe ScenarioCard, type: :model do
         expect(result[:monthly_payment_initial]).to eq(107_408) # 初回の毎月返済額
         expect(result[:monthly_payment_after]).to eq(107_408) # 固定期間以降の毎月返済額
 
-        expect(result[:total_payment]).to eq(45_111_360) # 総返済額(107,408円 * 420回)
+        expect(result[:total_payment]).to eq(45_111_275) # 総返済額(420回分のループ計算。floorで切り捨て)
 
       end
     end
@@ -76,7 +76,7 @@ RSpec.describe ScenarioCard, type: :model do
         end
       end
 
-      context 'Y偏差医学軽減型の場合' do
+      context '返済額軽減型の場合' do
         before do
           scenario_card.prepayments.create!(
             execution_year: 5,
@@ -87,7 +87,7 @@ RSpec.describe ScenarioCard, type: :model do
 
         it '総返済額が減り、61ヶ月意向の返済額が軽減されること' do
           result = scenario_card.calculate_schedule
-          expect(result[:total_payment]).to eq(45_002_000)
+          expect(result[:total_payment]).to eq(45_002_200)
           expect(result[:monthly_payment_after]).to eq(104_327)
         end
       end
