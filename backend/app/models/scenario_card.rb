@@ -1,5 +1,4 @@
 class ScenarioCard < ApplicationRecord
-
   has_many :prepayments, dependent: :destroy
 
   # 元利均等: 0, 元金均等: 1
@@ -11,7 +10,7 @@ class ScenarioCard < ApplicationRecord
     # 期間（年）を月数に変換
     months = period_years * 12
     # ループ用に元本を代入
-    balance = principal 
+    balance = principal
 
     # 毎月の返済額の初期値
     current_payment = calculate_equal_payment(balance, months, initial_rate_sub)
@@ -29,24 +28,24 @@ class ScenarioCard < ApplicationRecord
 
       # 当月適応金利の判定
       current_rate_bps = if initial_fixed? && fixed_years.present? && subsequent_rate_sub.present? && m > fixed_years * 12
-                            subsequent_rate_sub   
-                         else
+                            subsequent_rate_sub
+      else
                             initial_rate_sub
-                         end
+      end
 
       # 当月の利息計算
       interest = (balance * (current_rate_bps / 120000.0)).floor
 
       # 当月の返済額計算
       # 毎月返済額 or 残高の少ない方
-      payment_this_month = [current_payment, balance + interest].min
+      payment_this_month = [ current_payment, balance + interest ].min
       # 元本返済分を計算
       principal_paid = payment_this_month - interest
       # 残高から元本返済分を引く
       balance -= principal_paid
       # 総返済額に加算
       total_payment += payment_this_month
-    
+
       # 当初固定金利終了時に返済額再計算
       if initial_fixed? && fixed_years.present? && subsequent_rate_sub.present? && m == fixed_years * 12 && balance > 0
         remaining_months = months - m
@@ -58,7 +57,7 @@ class ScenarioCard < ApplicationRecord
       # 繰り上げ返済の実行判定と処理
       prepayment = active_prepayments.find { |p| p.execution_year * 12 == m }
       if prepayment && balance > 0
-        prepay_amount = [prepayment.amount, balance].min
+        prepay_amount = [ prepayment.amount, balance ].min
         balance -= prepay_amount
         total_payment += prepay_amount
 
@@ -69,20 +68,20 @@ class ScenarioCard < ApplicationRecord
           # 金額軽減再計算時の金利を判定
           rate_bps = if initial_fixed? && fixed_years.present? && m >= fixed_years * 12
                         subsequent_rate_sub
-                     else
+          else
                         initial_rate_sub
-                     end
+          end
           current_payment = calculate_equal_payment(balance, remaining_months, rate_bps)
           monthly_payment_after = current_payment
-            
+
         end
       end
     end
-    
+
       {
         monthly_payment_initial: monthly_payment_initial,
         monthly_payment_after: monthly_payment_after,
-        total_payment: total_payment  
+        total_payment: total_payment
       }
   end
 
@@ -93,7 +92,7 @@ class ScenarioCard < ApplicationRecord
       # 金利が0%の場合は単に元金を月数で割る
       return (balance / months.to_f).ceil if annual_rate_bps == 0
 
-      #万分栗の年利を月利(float)に変換
+      # 万分栗の年利を月利(float)に変換
       monthly_rate = annual_rate_bps / 120000.0
 
       # 返済額の計算式：元金 * 月利 * (1 + 月利) ^ 月数 / ((1 + 月利) ^ 月数 - 1)
@@ -103,6 +102,5 @@ class ScenarioCard < ApplicationRecord
       denominator = (1 + monthly_rate) ** months - 1
 
       (numerator / denominator).floor # 小数点以下切り捨て
-    
     end
 end

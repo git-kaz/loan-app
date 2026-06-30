@@ -5,47 +5,43 @@ RSpec.describe ScenarioCard, type: :model do
     context '全期間固定金利・元利均等返済の場合' do
       let(:scenario_card) do
         ScenarioCard.new(
-          principal: 40_000_000, #4000万円
-          period_years: 35, #35年
-          repayment_type: 0, #元利均等
-          interest_type: 1, #全期間固定
-          initial_rate_sub: 70 #金利0.7% (70 bps)
+          principal: 40_000_000, # 4000万円
+          period_years: 35, # 35年
+          repayment_type: 0, # 元利均等
+          interest_type: 1, # 全期間固定
+          initial_rate_sub: 70 # 金利0.7% (70 bps)
         )
       end
 
       it '正しく毎月の返済額、総返済額を計算できること' do
-
         result = scenario_card.calculate_schedule
 
         expect(result[:monthly_payment_initial]).to eq(107_408) # 初回の毎月返済額
         expect(result[:monthly_payment_after]).to eq(107_408) # 固定期間以降の毎月返済額
 
         expect(result[:total_payment]).to eq(45_111_275) # 総返済額(420回分のループ計算。floorで切り捨て)
-
       end
     end
 
     context '当初固定金利・元利均等返済の場合' do
       let(:scenario_card) do
         ScenarioCard.new(
-          principal: 40_000_000, #4000万円
-          period_years: 35, #35年
-          repayment_type: 0, #元利均等
-          interest_type: 2, #当初固定
-          initial_rate_sub: 90, #金利0.9% (90 bps)
-          fixed_years: 3, #3年間固定
-          subsequent_rate_sub: 150 #3年後の金利1.5% (150 bps)
+          principal: 40_000_000, # 4000万円
+          period_years: 35, # 35年
+          repayment_type: 0, # 元利均等
+          interest_type: 2, # 当初固定
+          initial_rate_sub: 90, # 金利0.9% (90 bps)
+          fixed_years: 3, # 3年間固定
+          subsequent_rate_sub: 150 # 3年後の金利1.5% (150 bps)
         )
       end
 
       it '正しく毎月の返済額、総返済額を計算できること' do
-
         result = scenario_card.calculate_schedule
 
         expect(result[:monthly_payment_initial]).to eq(111_059) # 初回の毎月返済額
         expect(result[:monthly_payment_after]).to eq(121_522) # 固定期間以降の毎月返済額
         expect(result[:total_payment]).to eq(50_662_572) # 総返済額(111,059円 * 36回 + 121,522円 * 384回)
-
       end
     end
 
@@ -53,11 +49,11 @@ RSpec.describe ScenarioCard, type: :model do
       let(:scenario_card) do
         # DB保存が必要なためcreate!を使用
         ScenarioCard.create!(
-          principal: 40_000_000, #4000万円
-          period_years: 35, #35年
-          repayment_type: 0, #元利均等
-          interest_type: 1, #全期間固定
-          initial_rate_sub: 70 #金利0.7% (70 bps)
+          principal: 40_000_000, # 4000万円
+          period_years: 35, # 35年
+          repayment_type: 0, # 元利均等
+          interest_type: 1, # 全期間固定
+          initial_rate_sub: 70 # 金利0.7% (70 bps)
         )
       end
 
@@ -66,7 +62,7 @@ RSpec.describe ScenarioCard, type: :model do
           scenario_card.prepayments.create!(
             execution_year: 5,
             amount: 1_000_000,
-            prepayment_type: 0 #期間短縮型
+            prepayment_type: 0 # 期間短縮型
           )
         end
 
@@ -81,7 +77,7 @@ RSpec.describe ScenarioCard, type: :model do
           scenario_card.prepayments.create!(
             execution_year: 5,
             amount: 1_000_000,
-            prepayment_type: 1 #返済額軽減型
+            prepayment_type: 1 # 返済額軽減型
           )
         end
 
