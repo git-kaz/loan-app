@@ -1,6 +1,7 @@
 import React from "react";
 import ControlPanel from "@/components/ControlPanel";
 import SummaryCards from "@/components/SummaryCards";
+import TimelineChart from "@/components/TimelineChart";
 
 export default function Home() {
   return (
@@ -20,7 +21,7 @@ export default function Home() {
 
           {/* 右下段：Rechartsグラフが入るプレースホルダー */}
           <div className="flex items-center justify-center border border-dashed border-slate-200 rounded-3xl h-[420px] text-slate-400 bg-white/50 backdrop-blur-sm shadow-sm">
-            ここにRechartsによる返済グラフが入ります
+            <TimelineChart />
           </div>
         </div>
       </div>
