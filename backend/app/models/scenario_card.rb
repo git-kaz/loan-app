@@ -19,12 +19,18 @@ class ScenarioCard < ApplicationRecord
     monthly_payment_after = current_payment
     total_payment = 0
 
+    chart_data = []
+
     # メモリに繰り上げ返済データを読み込んでおく
     active_prepayments = prepayments.to_a
 
     # 返済金額の計算
     (1..months).each do |m|
       break if balance <= 0
+
+      if m % 12 == 0
+          chart_data << { year: m / 12, payment: balance > 0 ? current_payment : 0 }
+      end
 
       # 当月適応金利の判定
       current_rate_bps = if initial_fixed? && fixed_years.present? && subsequent_rate_sub.present? && m > fixed_years * 12
@@ -78,10 +84,15 @@ class ScenarioCard < ApplicationRecord
       end
     end
 
+    while chart_data.size < period_years
+      chart_data << { year: chart_data.size + 1, payment: 0 }
+    end
+
       {
         monthly_payment_initial: monthly_payment_initial,
         monthly_payment_after: monthly_payment_after,
-        total_payment: total_payment
+        total_payment: total_payment,
+        chart_data: chart_data
       }
   end
 

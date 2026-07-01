@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   # API用ルーティング
   namespace :api do
     namespace :v1 do
-      resources :simulations, only: [:create]
+      resources :simulations, only: [ :create ]
     end
   end
 end
