@@ -8,7 +8,7 @@ interface SummaryCardsProps {
   result: (SimulationResult | null)[];
   activeScenarioIndex: number;
   setActiveScenarioIndex: (idx: number) => void;
-  onAddScenarioIndex: () => void;
+  onAddScenario: () => void;
   onRemoveScenario: (id: number) => void;
   loading: boolean;
 }

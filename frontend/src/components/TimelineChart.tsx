@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-
+import { Scenario } from "@/app/page";
 import {
   ResponsiveContainer,
   LineChart,
@@ -13,7 +13,15 @@ import {
   ReferenceLine,
 } from "recharts";
 
-export default function TimelineChart() {
+interface TimelineChartProps {
+  chartData: any[];
+  scenarios: Scenario[];
+}
+
+export default function TimelineChart({
+  chartData,
+  scenarios,
+}: TimelineChartProps) {
   // マウント状態を管理（Next.jsのSSRエラー対策）
   const [isMounted, setIsMounted] = useState(false);
 
@@ -21,17 +29,8 @@ export default function TimelineChart() {
     setIsMounted(true);
   }, []);
 
-  // 35年分の返済額の変化を表すダミーデータ（折れ線がカクカク動くように変化をつけます）
-  const dummyData = Array.from({ length: 35 }, (_, i) => {
-    const year = i + 1;
-    let payment = 111059; // 1〜3年目 (当初金利 0.9%)
-    if (year >= 4 && year <= 5) {
-      payment = 121522; // 4〜5年目 (金利上昇 1.5%)
-    } else if (year >= 6) {
-      payment = 104327; // 6年目以降 (5年目に100万円を返済額軽減型で繰り上げ返済)
-    }
-    return { year, payment };
-  });
+  // 各プランのテーマカラー（緑、青、紫）
+  const colors = ["#10b981", "#3b82f6", "#8b5cf6"];
 
   // マウントされるまでは骨組み（ローディングプレースホルダー）を表示しておく
   if (!isMounted) {
@@ -43,18 +42,17 @@ export default function TimelineChart() {
   }
 
   return (
-    <div className="w-full h-full p-4">
+    <div className="w-full h-full p-6 bg-white/50">
       <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
-        <span className="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
-        毎月返済額の推移 (35年シミュレーション)
+        <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse"></span>
+        毎月返済額の推移 (プラン比較シミュレーション)
       </h3>
 
       <div className="w-full h-[320px]">
-        {/* レスポンシブに親要素の幅いっぱいにグラフを広げるコンテナ */}
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
-            data={dummyData}
-            margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+            data={chartData}
+            margin={{ top: 10, right: 25, left: -10, bottom: 0 }}
           >
             {/* 薄いグリッド背景線 */}
             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -73,7 +71,7 @@ export default function TimelineChart() {
               stroke="#94a3b8"
               fontSize={11}
               tickLine={false}
-              tickFormatter={(value) => `${(value / 10000).toFixed(1)}万`}
+              tickFormatter={(value) => `${(value / 10000).toFixed(0)}万`}
             />
 
             {/* マウスホバー時のツールチップ */}
@@ -93,30 +91,44 @@ export default function TimelineChart() {
               }}
             />
 
-            {/* 5年目の繰り上げ返済タイミングを示す垂直の補助線 */}
-            <ReferenceLine
-              x={5}
-              stroke="#cbd5e1"
-              strokeDasharray="4 4"
-              label={{
-                value: "5年目: 繰上返済",
-                position: "insideTopRight",
-                fill: "#64748b",
-                fontSize: 10,
-                fontWeight: "600",
-              }}
-            />
+            {/* 🌟 繰り上げ返済が有効なプランの数だけ、縦の補助点線を引く */}
+            {scenarios.map((s, idx) => {
+              if (!s.prepaymentEnabled) return null;
+              const color = colors[idx] || colors[0];
+              return (
+                <ReferenceLine
+                  key={`ref-${s.id}`}
+                  x={s.prepaymentYear}
+                  stroke={color}
+                  strokeDasharray="4 4"
+                  strokeWidth={1.5}
+                  label={{
+                    value: `${s.name}: 繰上`,
+                    position: "insideTopRight",
+                    fill: color,
+                    fontSize: 9,
+                    fontWeight: "600",
+                  }}
+                />
+              );
+            })}
 
-            {/* 折れ線グラフ本体 */}
-            {/* type="stepAfter" にすることで、ローン金利切り替え特有の「カクカクとした階段状の線」を描画します */}
-            <Line
-              type="stepAfter"
-              dataKey="payment"
-              stroke="#2563eb"
-              strokeWidth={3}
-              dot={false}
-              activeDot={{ r: 6, strokeWidth: 0, fill: "#2563eb" }}
-            />
+            {/* 🌟 存在するプランの数だけ、対応する色の折れ線を描画する */}
+            {scenarios.map((s, idx) => {
+              const color = colors[idx] || colors[0];
+              return (
+                <Line
+                  key={s.id}
+                  type="stepAfter"
+                  dataKey={`payment${s.id}`}
+                  stroke={color}
+                  strokeWidth={2.5}
+                  dot={false}
+                  activeDot={{ r: 5, strokeWidth: 0, fill: color }}
+                  animationDuration={300}
+                />
+              );
+            })}
           </LineChart>
         </ResponsiveContainer>
       </div>

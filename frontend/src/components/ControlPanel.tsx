@@ -190,8 +190,36 @@ export default function ControlPanel({
       </div>
 
       {/* 5. 金利条件設定 (当初固定) */}
+      {(activeScenario.interestType === 0 ||
+        activeScenario.interestType === 1) && (
+        <div className="p-4 bg-blue-50/40 border border-blue-100/60 rounded-2xl mb-6 transition-all">
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-xs text-slate-500 font-medium">
+                借入金利
+              </span>
+              <span className="text-sm font-bold text-slate-800">
+                {activeScenario.initialRate.toFixed(2)} %
+              </span>
+            </div>
+            <input
+              type="range"
+              min="0.1"
+              max="10.0"
+              step="0.05"
+              value={activeScenario.initialRate}
+              onChange={(e) =>
+                onChangeField("initialRate", Number(e.target.value))
+              }
+              className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* 5-B. 当初固定(2) の場合は、3つの詳細スライダーを表示 */}
       {activeScenario.interestType === 2 && (
-        <div className="p-4 bg-blue-50/40 border border-blue-100/60 rounded-2xl mb-6">
+        <div className="p-4 bg-blue-50/40 border border-blue-100/60 rounded-2xl mb-6 transition-all">
           <div className="mb-4">
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs text-slate-500 font-medium">
