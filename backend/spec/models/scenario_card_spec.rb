@@ -18,8 +18,12 @@ RSpec.describe ScenarioCard, type: :model do
 
         expect(result[:monthly_payment_initial]).to eq(107_408) # 初回の毎月返済額
         expect(result[:monthly_payment_after]).to eq(107_408) # 固定期間以降の毎月返済額
-
         expect(result[:total_payment]).to eq(45_111_275) # 総返済額(420回分のループ計算。floorで切り捨て)
+
+        # rechart用データ
+        expect(result[:chart_data].size).to eq(35)
+        expect(result[:chart_data].first).to eq({ year: 1, payment: 107_408 })
+        expect(result[:chart_data].last).to eq({ year: 35, payment: 107_408 })
       end
     end
 
@@ -42,6 +46,12 @@ RSpec.describe ScenarioCard, type: :model do
         expect(result[:monthly_payment_initial]).to eq(111_059) # 初回の毎月返済額
         expect(result[:monthly_payment_after]).to eq(121_522) # 固定期間以降の毎月返済額
         expect(result[:total_payment]).to eq(50_662_572) # 総返済額(111,059円 * 36回 + 121,522円 * 384回)
+
+        # rechart用データ
+        expect(result[:chart_data].size).to eq(35)
+        expect(result[:chart_data][0]).to eq({ year: 1, payment: 111_059 })
+        expect(result[:chart_data][3]).to eq({ year: 4, payment: 121_522 })
+        expect(result[:chart_data].last).to eq({ year: 35, payment: 121_522 })
       end
     end
 
@@ -69,6 +79,10 @@ RSpec.describe ScenarioCard, type: :model do
         it '総返済額が減り、期間短縮効果が反映されること' do
           result = scenario_card.calculate_schedule
           expect(result[:total_payment]).to eq(44_881436)
+
+          expect(result[:chart_data].size).to eq(35)
+          expect(result[:chart_data][4]).to eq({ year: 5, payment: 107_408 })
+          expect(result[:chart_data].last).to eq({ year: 35, payment: 0 })
         end
       end
 
@@ -81,10 +95,14 @@ RSpec.describe ScenarioCard, type: :model do
           )
         end
 
-        it '総返済額が減り、61ヶ月意向の返済額が軽減されること' do
+        it '総返済額が減り、61ヶ月以降の返済額が軽減されること' do
           result = scenario_card.calculate_schedule
           expect(result[:total_payment]).to eq(45_002_200)
           expect(result[:monthly_payment_after]).to eq(104_327)
+
+          expect(result[:chart_data].size).to eq(35)
+          expect(result[:chart_data][4]).to eq({ year: 5, payment: 107_408 })
+          expect(result[:chart_data][5]).to eq({ year: 6, payment: 104_327 })
         end
       end
     end
