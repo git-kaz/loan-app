@@ -118,8 +118,9 @@ export default function Home() {
       setLoading(true);
       try {
         // fetchリクエストを作成
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
         const promises = scenarios.map((s) =>
-          fetch("http://localhost:3000/api/v1/simulations", {
+          fetch(`${apiBaseUrl}/api/v1/simulations`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
