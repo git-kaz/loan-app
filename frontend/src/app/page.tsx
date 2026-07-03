@@ -160,8 +160,10 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [scenarios]);
 
-  //recharts用に35年分のデータを配列に生成
-  const chartData = Array.from({ length: 35 }, (_, i) => {
+  //recharts用に1~50年分のデータを配列に生成
+  // 返済期間に応じてグラフも変動
+  const maxYears = Math.max(...scenarios.map((s) => s.periodYears), 1);
+  const chartData = Array.from({ length: maxYears }, (_, i) => {
     const year = i + 1;
     const dataPoint: any = { year };
 
