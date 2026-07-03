@@ -160,8 +160,10 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [scenarios]);
 
-  //recharts用に35年分のデータを配列に生成
-  const chartData = Array.from({ length: 35 }, (_, i) => {
+  //recharts用に1~50年分のデータを配列に生成
+  // 返済期間に応じてグラフも変動
+  const maxYears = Math.max(...scenarios.map((s) => s.periodYears), 1);
+  const chartData = Array.from({ length: maxYears }, (_, i) => {
     const year = i + 1;
     const dataPoint: any = { year };
 
@@ -181,7 +183,7 @@ export default function Home() {
   //
   return (
     // クリーンなライトブルーからホワイトへのグラデーション背景
-    <main className="min-h-screen bg-gradient-to-br from-blue-50/30 via-slate-50 to-blue-50/20 p-8 flex items-start justify-center">
+    <main className="min-h-screen bg-background p-8 flex items-start justify-center">
       {/* 画面幅に合わせたメインコンテナ (最大幅 1200px) */}
       <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* 左カラム：条件設定パネル (3カラムのうちの1つを使用) */}

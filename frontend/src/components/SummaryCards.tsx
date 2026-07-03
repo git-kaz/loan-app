@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Scenario, SimulationResult } from "@/app/page";
+import { Scenario, SimulationResult } from "@/app/page"; // page.tsxから型定義をインポート
 
 interface SummaryCardsProps {
   scenarios: Scenario[];
@@ -22,29 +22,28 @@ export default function SummaryCards({
   onRemoveScenario,
   loading,
 }: SummaryCardsProps) {
-  // 比較する3つのシナリオのダミーデータ
+  // 🌟 改善: カード背景をご指定のソリッドカラーに変更し、アクティブ時は「太い白のリング(ring-white/70)」でハイライトします
   const cardStyles = [
     {
-      color: "border-emerald-200 bg-emerald-50/20",
-      activeColor:
-        "ring-2 ring-emerald-500 border-transparent shadow-emerald-100",
-      textColor: "text-emerald-700",
+      color: "border-plan-a bg-plan-a hover:brightness-105",
+      activeColor: "ring-4 ring-white/70 shadow-lg shadow-plan-a/30 scale-[1.02]",
+      textColor: "text-[#fdfdfd] font-extrabold",
     },
     {
-      color: "border-blue-200 bg-blue-50/20",
-      activeColor: "ring-2 ring-blue-500 border-transparent shadow-blue-100",
-      textColor: "text-blue-700",
+      color: "border-plan-b bg-plan-b hover:brightness-105",
+      activeColor: "ring-4 ring-white/70 shadow-lg shadow-plan-b/30 scale-[1.02]",
+      textColor: "text-[#fdfdfd] font-extrabold",
     },
     {
-      color: "border-violet-200 bg-violet-50/20",
-      activeColor:
-        "ring-2 ring-violet-500 border-transparent shadow-violet-100",
-      textColor: "text-violet-700",
+      color: "border-plan-c bg-plan-c hover:brightness-105", // プランC (パステルピンク)
+      activeColor: "ring-4 ring-white/70 shadow-lg shadow-plan-c/30 scale-[1.02]",
+      textColor: "text-[#fdfdfd] font-extrabold",
     },
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+      
       {/* 1. 存在するプランのカードをループ描画 */}
       {scenarios.map((s, idx) => {
         const isActive = idx === activeScenarioIndex;
@@ -55,11 +54,12 @@ export default function SummaryCards({
           <div
             key={s.id}
             onClick={() => setActiveScenarioIndex(idx)}
+            // 🌟 改善: 非アクティブ時は不透明度を85%にして落ち着かせ、アクティブ時に100%＋太い白枠で目立たせます
             className={`relative border rounded-2xl p-4 shadow-sm backdrop-blur-sm transition-all cursor-pointer min-h-[140px] hover:shadow-md flex flex-col justify-between ${
               style.color
-            } ${isActive ? `${style.activeColor} shadow-lg scale-[1.02]` : "opacity-80"}`}
+            } ${isActive ? style.activeColor : "border-stone-300/40 opacity-85 hover:opacity-100"}`}
           >
-            {/* ✕ 削除ボタン (プランが2つ以上の時だけ表示、かつAは残す) */}
+            {/* ✕ 削除ボタン (プランが2つ以上の時だけ表示、白背景ホバー) */}
             {scenarios.length > 1 && (
               <button
                 type="button"
@@ -67,7 +67,7 @@ export default function SummaryCards({
                   e.stopPropagation(); // カード本体のクリックイベントが走るのを防ぎます
                   onRemoveScenario(s.id);
                 }}
-                className="absolute top-3 right-3 text-slate-400 hover:text-red-500 hover:scale-110 transition-all font-bold p-1 cursor-pointer rounded-full hover:bg-slate-100/50 w-6 h-6 flex items-center justify-center"
+                className="absolute top-3 right-3 text-white/75 hover:text-white hover:scale-110 transition-all font-bold p-1 cursor-pointer rounded-full hover:bg-white/20 w-6 h-6 flex items-center justify-center z-10"
                 title="プランを削除"
               >
                 ✕
@@ -75,10 +75,10 @@ export default function SummaryCards({
             )}
 
             <div>
-              <div className="text-xs font-bold text-slate-500 mb-2 flex items-center gap-1.5">
-                {/* 編集中のプランにはピンを表示 */}
+              {/* プラン名の表示 (白抜き & 半透明バッジ) */}
+              <div className="text-xs font-bold text-[#fdfdfd] mb-2 flex items-center gap-1.5">
                 {isActive && (
-                  <span className="text-[10px] bg-slate-800 text-white px-1.5 py-0.5 rounded-full">
+                  <span className="text-[10px] bg-white/20 text-[#fdfdfd] border border-white/25 px-1.5 py-0.5 rounded-full font-bold">
                     編集枠
                   </span>
                 )}
@@ -87,53 +87,44 @@ export default function SummaryCards({
 
               {/* 毎月返済額の表示 */}
               <div className="mb-2">
-                <div className="text-[10px] text-slate-400">毎月返済額</div>
+                <div className="text-[10px] text-white/80 font-bold mb-0.5">毎月返済額</div>
                 {loading && !res ? (
-                  <span className="text-sm font-semibold text-slate-400 animate-pulse">
-                    計算中...
-                  </span>
+                  <span className="text-sm font-semibold text-white/85 animate-pulse">計算中...</span>
                 ) : res ? (
                   <div className="flex flex-wrap items-baseline gap-x-1">
-                    <span className={`text-xl font-bold ${style.textColor}`}>
+                    <span className={`text-xl font-black ${style.textColor}`}>
                       {res.monthly_payment_initial.toLocaleString()}
                     </span>
-                    <span className="text-xs text-slate-500">円</span>
-                    {res.monthly_payment_after &&
-                      res.monthly_payment_after !==
-                        res.monthly_payment_initial && (
-                        <span className="text-[10px] text-slate-400 font-medium whitespace-nowrap">
-                          ➔ 後半 {res.monthly_payment_after.toLocaleString()}円
-                        </span>
-                      )}
+                    <span className="text-xs text-white/90 font-bold">円</span>
+                    {res.monthly_payment_after && res.monthly_payment_after !== res.monthly_payment_initial && (
+                      <span className="text-[10px] text-white/85 font-extrabold whitespace-nowrap">
+                        ➔ 後半 {res.monthly_payment_after.toLocaleString()}円
+                      </span>
+                    )}
                   </div>
                 ) : (
-                  <span className="text-sm font-semibold text-slate-400">
-                    --- 円
-                  </span>
+                  <span className="text-sm font-bold text-white/80">--- 円</span>
                 )}
               </div>
             </div>
 
             {/* 総返済額の表示 */}
-            <div className="border-t border-slate-200/50 pt-2">
-              <div className="text-[10px] text-slate-400">総返済額</div>
+            <div className="border-t border-white/20 pt-2">
+              <div className="text-[10px] text-white/80 font-bold mb-0.5">総返済額</div>
               {loading && !res ? (
-                <span className="text-sm font-semibold text-slate-400 animate-pulse">
-                  計算中...
-                </span>
+                <span className="text-sm font-semibold text-white/85 animate-pulse">計算中...</span>
               ) : res ? (
                 <div className="flex items-baseline gap-0.5">
-                  <span className="text-lg font-bold text-slate-700">
+                  <span className="text-lg font-black text-[#fdfdfd]">
                     {(res.total_payment / 10000).toFixed(1)}
                   </span>
-                  <span className="text-xs text-slate-500">万円</span>
+                  <span className="text-xs text-white/90 font-bold">万円</span>
                 </div>
               ) : (
-                <span className="text-sm font-semibold text-slate-400">
-                  --- 万円
-                </span>
+                <span className="text-sm font-bold text-white/80">--- 万円</span>
               )}
             </div>
+
           </div>
         );
       })}
@@ -143,15 +134,14 @@ export default function SummaryCards({
         <button
           type="button"
           onClick={onAddScenario}
-          className="border-2 border-dashed border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:border-blue-400    
-  hover:bg-blue-50/10 transition-all cursor-pointer min-h-[140px] text-slate-400 hover:text-blue-500 group"
+          // サンドグレー背景の上で映えるよう、枠を少し濃くしています
+          className="border-2 border-dashed border-stone-400 bg-white/70 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:border-stone-500 hover:bg-stone-100 transition-all cursor-pointer min-h-[140px] text-stone-600 hover:text-stone-850 group"
         >
-          <span className="text-2xl font-bold group-hover:scale-110 transition-all">
-            +
-          </span>
-          <span className="text-xs font-semibold">比較プランを追加</span>
+          <span className="text-2xl font-bold group-hover:scale-110 transition-all">+</span>
+          <span className="text-xs font-bold">比較プランを追加</span>
         </button>
       )}
+
     </div>
   );
 }

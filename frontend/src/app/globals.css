@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #EEEEE9; /* 背景：温かみのあるウォームグレー */
+  --foreground: #2d2a26; /* 文字：優しいチャコールブラウン */
 }
 
 @theme inline {
@@ -10,13 +10,16 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* 🌟 パステルカラーパレット (プランCをピンクへ変更 ＆ テキストを白抜き用#fdfdfdに統一) */
+  --color-plan-a: #70B837;       /* プランA (グリーン) */
+  --color-plan-a-dark: #fdfdfd;  /* プランA用テキスト (白抜き) */
+  
+  --color-plan-b: #EEA045;       /* プランB (オレンジ) */
+  --color-plan-b-dark: #fdfdfd;  /* プランB用テキスト (白抜き) */
+
+  --color-plan-c: #FF9999;       /* 👈 プランC (パステルピンクに変更) */
+  --color-plan-c-dark: #fdfdfd;  /* 👈 プランC用テキスト (白抜き) */
 }
 
 body {
