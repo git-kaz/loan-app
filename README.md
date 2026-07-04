@@ -1,4 +1,4 @@
-# 📊 「LoanSchumy（ローンシュミー）」
+# 📊 「LoanSchumy（ロンシュミー）」
 
 <p align="center">
   <img src="frontend/src/app/opengraph-image.png" alt="LoanSchumy OGP" width="600">
