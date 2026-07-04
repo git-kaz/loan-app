@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import ControlPanel from "@/components/ControlPanel";
 import SummaryCards from "@/components/SummaryCards";
 import TimelineChart from "@/components/TimelineChart";
@@ -118,7 +119,8 @@ export default function Home() {
       setLoading(true);
       try {
         // fetchリクエストを作成
-        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+        const apiBaseUrl =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
         const promises = scenarios.map((s) =>
           fetch(`${apiBaseUrl}/api/v1/simulations`, {
             method: "POST",
@@ -185,34 +187,48 @@ export default function Home() {
   return (
     // クリーンなライトブルーからホワイトへのグラデーション背景
     <main className="min-h-screen bg-background p-8 flex items-start justify-center">
-      {/* 画面幅に合わせたメインコンテナ (最大幅 1200px) */}
-      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* 左カラム：条件設定パネル (3カラムのうちの1つを使用) */}
-        <div className="md:col-span-1">
-          <ControlPanel
-            scenarios={scenarios}
-            activeScenarioIndex={activeScenarioIndex}
-            setActiveScenarioIndex={setActiveScenarioIndex}
-            onChangeField={updateActiveScenarioField}
+      <div className="w-full max-w-6xl flex flex-col gap-6">
+        <header className="w-full max-w-6xl mb-6 flex items-center gap-3">
+          <Image
+            src="/logo.png"
+            alt="LoanSchumy Logo"
+            className="w-10 h-10 object-contain"
+            width={40}
+            height={40}
           />
-        </div>
+          <h1 className="text-2xl font-extrabold text-stone-850 tracking-tight font-sans">
+            LoanSchumy
+          </h1>
+        </header>
+        {/* 画面幅に合わせたメインコンテナ (最大幅 1200px) */}
+        <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* 左カラム：条件設定パネル (3カラムのうちの1つを使用) */}
+          <div className="md:col-span-1">
+            <ControlPanel
+              scenarios={scenarios}
+              activeScenarioIndex={activeScenarioIndex}
+              setActiveScenarioIndex={setActiveScenarioIndex}
+              onChangeField={updateActiveScenarioField}
+            />
+          </div>
 
-        {/* 右カラム：結果表示エリア (3カラムのうちの残り2つを使用) */}
-        <div className="md:col-span-2 flex flex-col gap-6 w-full">
-          {/* 右上段：3つのシナリオ比較カード */}
-          <SummaryCards
-            scenarios={scenarios}
-            result={apiResults}
-            activeScenarioIndex={activeScenarioIndex}
-            setActiveScenarioIndex={setActiveScenarioIndex}
-            onAddScenario={addScenario}
-            onRemoveScenario={removeScenario}
-            loading={loading}
-          />
+          {/* 右カラム：結果表示エリア (3カラムのうちの残り2つを使用) */}
+          <div className="md:col-span-2 flex flex-col gap-6 w-full">
+            {/* 右上段：3つのシナリオ比較カード */}
+            <SummaryCards
+              scenarios={scenarios}
+              result={apiResults}
+              activeScenarioIndex={activeScenarioIndex}
+              setActiveScenarioIndex={setActiveScenarioIndex}
+              onAddScenario={addScenario}
+              onRemoveScenario={removeScenario}
+              loading={loading}
+            />
 
-          {/* 右下段：Rechartsグラフが入るプレースホルダー */}
-          <div className="flex items-center justify-center border border-dashed border-slate-200 rounded-3xl h-[420px] text-slate-400 bg-white/50 backdrop-blur-sm shadow-sm">
-            <TimelineChart chartData={chartData} scenarios={scenarios} />
+            {/* 右下段：Rechartsグラフが入るプレースホルダー */}
+            <div className="flex items-center justify-center border border-dashed border-slate-200 rounded-3xl h-[420px] text-slate-400 bg-white/50 backdrop-blur-sm shadow-sm">
+              <TimelineChart chartData={chartData} scenarios={scenarios} />
+            </div>
           </div>
         </div>
       </div>
