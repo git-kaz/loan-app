@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import ControlPanel from "@/components/ControlPanel";
 import SummaryCards from "@/components/SummaryCards";
 import TimelineChart from "@/components/TimelineChart";
@@ -118,7 +119,8 @@ export default function Home() {
       setLoading(true);
       try {
         // fetchリクエストを作成
-        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+        const apiBaseUrl =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
         const promises = scenarios.map((s) =>
           fetch(`${apiBaseUrl}/api/v1/simulations`, {
             method: "POST",
@@ -185,36 +187,75 @@ export default function Home() {
   return (
     // クリーンなライトブルーからホワイトへのグラデーション背景
     <main className="min-h-screen bg-background p-8 flex items-start justify-center">
-      {/* 画面幅に合わせたメインコンテナ (最大幅 1200px) */}
-      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* 左カラム：条件設定パネル (3カラムのうちの1つを使用) */}
-        <div className="md:col-span-1">
-          <ControlPanel
-            scenarios={scenarios}
-            activeScenarioIndex={activeScenarioIndex}
-            setActiveScenarioIndex={setActiveScenarioIndex}
-            onChangeField={updateActiveScenarioField}
-          />
-        </div>
+      <div className="w-full max-w-6xl flex flex-col gap-6">
+        <header
+          className="w-full flex items-center px-6 py-4 bg-white/70 backdrop-blur-md border border-stone-200/80 rounded-3xl shadow-sm shadow-    
+  stone-200/30 mb-8 transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <div className="hover:scale-105 transition-transform duration-300 ease-out cursor-pointer flex items-center">
+              <Image
+                src="/logo.png"
+                alt="LoanSchumy Logo"
+                width={60}
+                height={60}
+                priority
+                className="object-contain"
+              />
+            </div>
+            <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-2">
+              {/* 美しいグラデーションのかかったタイトル */}
+              <h1 className="text-3xl font-black tracking-tight font-sans text-stone-600">
+                LoanSchumy
+              </h1>
+              {/* 優しいフォントのサブタイトル */}
+              <span className="text-sm font-medium text-stone-500 font-sans tracking-wide">
+                住宅ローン比較シミュレーター
+              </span>
+            </div>
+          </div>
+        </header>
+        {/* 画面幅に合わせたメインコンテナ (最大幅 1200px) */}
+        <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* 左カラム：条件設定パネル (3カラムのうちの1つを使用) */}
+          <div className="md:col-span-1">
+            <ControlPanel
+              scenarios={scenarios}
+              activeScenarioIndex={activeScenarioIndex}
+              setActiveScenarioIndex={setActiveScenarioIndex}
+              onChangeField={updateActiveScenarioField}
+            />
+          </div>
 
-        {/* 右カラム：結果表示エリア (3カラムのうちの残り2つを使用) */}
-        <div className="md:col-span-2 flex flex-col gap-6 w-full">
-          {/* 右上段：3つのシナリオ比較カード */}
-          <SummaryCards
-            scenarios={scenarios}
-            result={apiResults}
-            activeScenarioIndex={activeScenarioIndex}
-            setActiveScenarioIndex={setActiveScenarioIndex}
-            onAddScenario={addScenario}
-            onRemoveScenario={removeScenario}
-            loading={loading}
-          />
+          {/* 右カラム：結果表示エリア (3カラムのうちの残り2つを使用) */}
+          <div className="md:col-span-2 flex flex-col gap-6 w-full">
+            {/* 右上段：3つのシナリオ比較カード */}
+            <SummaryCards
+              scenarios={scenarios}
+              result={apiResults}
+              activeScenarioIndex={activeScenarioIndex}
+              setActiveScenarioIndex={setActiveScenarioIndex}
+              onAddScenario={addScenario}
+              onRemoveScenario={removeScenario}
+              loading={loading}
+            />
 
-          {/* 右下段：Rechartsグラフが入るプレースホルダー */}
-          <div className="flex items-center justify-center border border-dashed border-slate-200 rounded-3xl h-[420px] text-slate-400 bg-white/50 backdrop-blur-sm shadow-sm">
-            <TimelineChart chartData={chartData} scenarios={scenarios} />
+            {/* 右下段：Rechartsグラフが入るプレースホルダー */}
+            <div className="flex items-center justify-center border border-dashed border-slate-200 rounded-3xl h-[420px] text-slate-400 bg-white/50 backdrop-blur-sm shadow-sm">
+              <TimelineChart chartData={chartData} scenarios={scenarios} />
+            </div>
           </div>
         </div>
+        <footer className="mt-12 py-6 border-t border-stone-200/60 text-center flex flex-col gap-2 text-stone-400">
+          <p className="text-[10px] md:text-xs leading-relaxed max-w-5xl mx-auto px-4">
+            ※
+            本シミュレーション結果は試算値であり、実際の借入金利や返済総額を保証するものではありません。
+            実際のご契約の際は、必ず各金融機関の提示する条件をご確認ください。
+          </p>
+          <p className="text-xs font-medium font-sans">
+            &copy; {new Date().getFullYear()} LoanSchumy. All rights reserved.
+          </p>
+        </footer>
       </div>
     </main>
   );
