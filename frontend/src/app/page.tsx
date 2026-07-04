@@ -188,17 +188,32 @@ export default function Home() {
     // クリーンなライトブルーからホワイトへのグラデーション背景
     <main className="min-h-screen bg-background p-8 flex items-start justify-center">
       <div className="w-full max-w-6xl flex flex-col gap-6">
-        <header className="w-full max-w-6xl mb-6 flex items-center gap-3">
-          <Image
-            src="/logo.png"
-            alt="LoanSchumy Logo"
-            className="w-10 h-10 object-contain"
-            width={40}
-            height={40}
-          />
-          <h1 className="text-2xl font-extrabold text-stone-850 tracking-tight font-sans">
-            LoanSchumy
-          </h1>
+        <header
+          className="w-full flex items-center px-6 py-4 bg-white/70 backdrop-blur-md border border-stone-200/80 rounded-3xl shadow-sm shadow-    
+  stone-200/30 mb-8 transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <div className="hover:scale-105 transition-transform duration-300 ease-out cursor-pointer flex items-center">
+              <Image
+                src="/logo.png"
+                alt="LoanSchumy Logo"
+                width={60}
+                height={60}
+                priority
+                className="object-contain"
+              />
+            </div>
+            <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-2">
+              {/* 美しいグラデーションのかかったタイトル */}
+              <h1 className="text-3xl font-black tracking-tight font-sans text-stone-600">
+                LoanSchumy
+              </h1>
+              {/* 優しいフォントのサブタイトル */}
+              <span className="text-sm font-medium text-stone-500 font-sans tracking-wide">
+                住宅ローン比較シミュレーター
+              </span>
+            </div>
+          </div>
         </header>
         {/* 画面幅に合わせたメインコンテナ (最大幅 1200px) */}
         <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -231,6 +246,16 @@ export default function Home() {
             </div>
           </div>
         </div>
+        <footer className="mt-12 py-6 border-t border-stone-200/60 text-center flex flex-col gap-2 text-stone-400">
+          <p className="text-[10px] md:text-xs leading-relaxed max-w-5xl mx-auto px-4">
+            ※
+            本シミュレーション結果は試算値であり、実際の借入金利や返済総額を保証するものではありません。
+            実際のご契約の際は、必ず各金融機関の提示する条件をご確認ください。
+          </p>
+          <p className="text-xs font-medium font-sans">
+            &copy; {new Date().getFullYear()} LoanSchumy. All rights reserved.
+          </p>
+        </footer>
       </div>
     </main>
   );
