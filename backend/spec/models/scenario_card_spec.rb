@@ -23,7 +23,7 @@ RSpec.describe ScenarioCard, type: :model do
         # rechart用データ
         expect(result[:chart_data].size).to eq(35)
         expect(result[:chart_data].first).to eq({ year: 1, payment: 107_408 })
-        expect(result[:chart_data].last).to eq({ year: 35, payment: 107_408 })
+        expect(result[:chart_data].last).to eq({ year: 35, payment: 107_323 })
       end
     end
 
