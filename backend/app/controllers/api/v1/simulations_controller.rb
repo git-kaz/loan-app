@@ -18,6 +18,12 @@ class Api::V1::SimulationsController < ApplicationController
       prepayment_type: simulation_params[:prepayment_type].to_i
     )
     end
+    
+    if card.invalid?
+      render json: { errors: card.errors.full_messages }, status: :unprocessable_entity
+      return
+    end
+
     # 計算を実行し、結果をjsonで返す
     render json: card.calculate_schedule
   end

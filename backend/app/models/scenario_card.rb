@@ -14,6 +14,8 @@ class ScenarioCard < ApplicationRecord
   with_options if: :initial_fixed? do |card|
     card.validates :fixed_years, presence: true, numericality: { only_integer: true, greater_than: 0 }
     card.validates :subsequent_rate_sub, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  
+  validates_associated :prepayments
   end
 
 
