@@ -18,7 +18,7 @@ class Api::V1::SimulationsController < ApplicationController
       prepayment_type: simulation_params[:prepayment_type].to_i
     )
     end
-    
+
     if card.invalid?
       render json: { errors: card.errors.full_messages }, status: :unprocessable_entity
       return
