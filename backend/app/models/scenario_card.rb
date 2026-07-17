@@ -6,6 +6,18 @@ class ScenarioCard < ApplicationRecord
   # 全期間固定: 0, 全期間変動: 1, 当初固定: 2
   enum :interest_type, { floating: 0, fully_fixed: 1, initial_fixed: 2 }
 
+  validates :principal, presence: true, numericality: { only_integer: true, greater_than: 0 }
+  validates :period_years, presence: true, numericality: { only_integer: true, greater_than: 0 }
+  validates :initial_rate_sub, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :repayment_type, presence: true
+  validates :interest_type, presence: true
+  with_options if: :initial_fixed? do |card|
+    card.validates :fixed_years, presence: true, numericality: { only_integer: true, greater_than: 0 }
+    card.validates :subsequent_rate_sub, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  end
+
+  validates_associated :prepayments
+
   def calculate_schedule
     # 期間（年）を月数に変換
     months = period_years * 12
