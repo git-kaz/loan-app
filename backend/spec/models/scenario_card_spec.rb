@@ -23,7 +23,58 @@ RSpec.describe ScenarioCard, type: :model do
         # rechart用データ
         expect(result[:chart_data].size).to eq(35)
         expect(result[:chart_data].first).to eq({ year: 1, payment: 107_408 })
-        expect(result[:chart_data].last).to eq({ year: 35, payment: 107_408 })
+        expect(result[:chart_data].last).to eq({ year: 35, payment: 107_323 })
+      end
+    end
+
+    context '全期間固定金利、元金均等返済の場合' do
+      let(:scenario_card) do
+        ScenarioCard.new(
+          principal: 40_000_000,
+          period_years: 35,
+          repayment_type: 1,
+          interest_type: 1,
+          initial_rate_sub: 70
+        )
+      end
+
+      it '正しく毎月の返済額、総返済額を計算できること' do
+        result = scenario_card.calculate_schedule
+
+        expect(result[:monthly_payment_initial]).to eq(118_572)
+        expect(result[:total_payment]).to eq(44_911_410)
+
+        expect(result[:chart_data].size).to eq(35)
+        expect(result[:chart_data].first).to eq({ year: 1, payment: 117_961 })
+        expect(result[:chart_data].last).to eq({ year: 35, payment: 94_914 })
+      end
+    end
+
+    context '当初固定金利・元金均等返済の場合' do
+      let(:scenario_card) do
+        ScenarioCard.new(
+          principal: 40_000_000, # 4000万円
+          period_years: 35, # 35年
+          repayment_type: 1, # 元金均等
+          interest_type: 2, # 当初固定
+          initial_rate_sub: 70,
+          fixed_years: 3, #
+          subsequent_rate_sub: 150
+        )
+      end
+
+      it '正しく毎月の返済額、総返済額を計算できること' do
+        result = scenario_card.calculate_schedule
+
+        expect(result[:monthly_payment_initial]).to eq(118_572) # 初回の毎月返済額
+        expect(result[:monthly_payment_after]).to eq(140_953) # 固定期間終了後
+
+        expect(result[:total_payment]).to eq(49_604_691)
+
+        expect(result[:chart_data].size).to eq(35)
+        expect(result[:chart_data][0]).to eq({ year: 1, payment: 117_961 })
+        expect(result[:chart_data][3]).to eq({ year: 4, payment: 139_643 })
+        expect(result[:chart_data].last).to eq({ year: 35, payment: 94_977 })
       end
     end
 

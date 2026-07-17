@@ -13,10 +13,19 @@ class ScenarioCard < ApplicationRecord
     balance = principal
 
     # 毎月の返済額の初期値
-    current_payment = calculate_equal_payment(balance, months, initial_rate_sub)
+    if equal_payment?
+      current_payment = calculate_equal_payment(balance, months, initial_rate_sub)
 
-    monthly_payment_initial = current_payment
-    monthly_payment_after = current_payment
+      monthly_payment_initial = current_payment
+      monthly_payment_after = current_payment
+
+    else
+      current_principal_payment = (balance / months.to_f).ceil
+      initial_interest = (balance * (initial_rate_sub / 120000.0)).floor
+      monthly_payment_initial = current_principal_payment + initial_interest
+      monthly_payment_after = monthly_payment_initial
+    end
+
     total_payment = 0
 
     chart_data = []
@@ -28,23 +37,16 @@ class ScenarioCard < ApplicationRecord
     (1..months).each do |m|
       break if balance <= 0
 
-      if m % 12 == 0
-          chart_data << { year: m / 12, payment: balance > 0 ? current_payment : 0 }
-      end
-
       # 当月適応金利の判定
-      current_rate_bps = if initial_fixed? && fixed_years.present? && subsequent_rate_sub.present? && m > fixed_years * 12
-                            subsequent_rate_sub
-      else
-                            initial_rate_sub
-      end
+      current_rate_bps = current_rate_bps_at(m)
 
       # 当月の利息計算
       interest = (balance * (current_rate_bps / 120000.0)).floor
 
       # 当月の返済額計算
       # 毎月返済額 or 残高の少ない方
-      payment_this_month = [ current_payment, balance + interest ].min
+      target_payment = equal_payment? ? current_payment : (current_principal_payment + interest)
+      payment_this_month = [ target_payment, balance + interest ].min
       # 元本返済分を計算
       principal_paid = payment_this_month - interest
       # 残高から元本返済分を引く
@@ -52,12 +54,23 @@ class ScenarioCard < ApplicationRecord
       # 総返済額に加算
       total_payment += payment_this_month
 
+      if m % 12 == 0
+          chart_data << { year: m / 12, payment: payment_this_month }
+
+      end
+
       # 当初固定金利終了時に返済額再計算
       if initial_fixed? && fixed_years.present? && subsequent_rate_sub.present? && m == fixed_years * 12 && balance > 0
         remaining_months = months - m
         # 残りの返済額を再計算
-        current_payment = calculate_equal_payment(balance, remaining_months, subsequent_rate_sub)
-        monthly_payment_after = current_payment
+        if equal_payment?
+          current_payment = calculate_equal_payment(balance, remaining_months, current_rate_bps_at(m+1))
+          monthly_payment_after = current_payment
+        else
+          next_rate_bps = current_rate_bps_at(m+1)
+          next_month_interest = (balance * (next_rate_bps / 120000.0)).floor
+          monthly_payment_after = current_principal_payment + next_month_interest
+        end
       end
 
       # 繰り上げ返済の実行判定と処理
@@ -70,16 +83,15 @@ class ScenarioCard < ApplicationRecord
         # 返済額軽減型の場合は翌月以降の返済額を再計算
         if prepayment.payment_reduction?
           remaining_months = months - m
-
-          # 金額軽減再計算時の金利を判定
-          rate_bps = if initial_fixed? && fixed_years.present? && m >= fixed_years * 12
-                        subsequent_rate_sub
+          next_rate_bps = current_rate_bps_at(m+1)
+          if equal_payment?
+            current_payment = calculate_equal_payment(balance, remaining_months, next_rate_bps)
+            monthly_payment_after = current_payment
           else
-                        initial_rate_sub
+            current_principal_payment = (balance / remaining_months.to_f).ceil
+            next_month_interest = (balance * (next_rate_bps / 120000.0)).floor
+            monthly_payment_after = current_principal_payment + next_month_interest
           end
-          current_payment = calculate_equal_payment(balance, remaining_months, rate_bps)
-          monthly_payment_after = current_payment
-
         end
       end
     end
@@ -113,5 +125,13 @@ class ScenarioCard < ApplicationRecord
       denominator = (1 + monthly_rate) ** months - 1
 
       (numerator / denominator).floor # 小数点以下切り捨て
+    end
+
+    def current_rate_bps_at(month)
+      if initial_fixed? && fixed_years.present? &&subsequent_rate_sub.present? && month > fixed_years * 12
+        subsequent_rate_sub
+      else
+        initial_rate_sub
+      end
     end
 end
