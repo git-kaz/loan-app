@@ -45,11 +45,11 @@ RSpec.describe ScenarioCard, type: :model do
         expect(result[:total_payment]).to eq(44_911_410)
 
         expect(result[:chart_data].size).to eq(35)
-        expect(result[:chart_data].first).to eq({ year:1, payment: 117_961 })
+        expect(result[:chart_data].first).to eq({ year: 1, payment: 117_961 })
         expect(result[:chart_data].last).to eq({ year: 35, payment: 94_914 })
       end
     end
-    
+
     context '当初固定金利・元金均等返済の場合' do
       let(:scenario_card) do
         ScenarioCard.new(
@@ -70,7 +70,7 @@ RSpec.describe ScenarioCard, type: :model do
         expect(result[:monthly_payment_after]).to eq(140_953) # 固定期間終了後
 
         expect(result[:total_payment]).to eq(49_604_691)
-        
+
         expect(result[:chart_data].size).to eq(35)
         expect(result[:chart_data][0]).to eq({ year: 1, payment: 117_961 })
         expect(result[:chart_data][3]).to eq({ year: 4, payment: 139_643 })

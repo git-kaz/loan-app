@@ -18,7 +18,7 @@ class ScenarioCard < ApplicationRecord
 
       monthly_payment_initial = current_payment
       monthly_payment_after = current_payment
-      
+
     else
       current_principal_payment = (balance / months.to_f).ceil
       initial_interest = (balance * (initial_rate_sub / 120000.0)).floor
@@ -56,7 +56,7 @@ class ScenarioCard < ApplicationRecord
 
       if m % 12 == 0
           chart_data << { year: m / 12, payment: payment_this_month }
-          
+
       end
 
       # 当初固定金利終了時に返済額再計算
