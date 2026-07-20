@@ -18,6 +18,23 @@ class ScenarioCard < ApplicationRecord
 
   validates_associated :prepayments
 
+  # initial_rateをモデルで変換
+  def initial_rate=(value)
+    self.initial_rate_sub = value.present? ? (value.to_f * 100).round : nil
+  end
+
+  def initial_rate
+    initial_rate_sub.present? ? initial_rate_sub / 100.0 : nil
+  end
+
+  def subsequent_rate=(value)
+    self.subsequent_rate_sub = value.present? ? (value.to_f * 100).round : nil
+  end
+
+  def subsequent_rate
+    subsequent_rate_sub.present? ? subsequent_rate_sub / 100.0 : nil
+  end
+
   def calculate_schedule
     # 期間（年）を月数に変換
     months = period_years * 12

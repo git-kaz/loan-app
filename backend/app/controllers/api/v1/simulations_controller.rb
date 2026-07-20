@@ -6,9 +6,9 @@ class Api::V1::SimulationsController < ApplicationController
       period_years: simulation_params[:years].to_i,
       repayment_type: simulation_params[:repayment_type].to_i,
       interest_type: simulation_params[:interest_type].to_i,
-      initial_rate_sub: (simulation_params[:initial_rate].to_f * 100).round,
+      initial_rate: simulation_params[:initial_rate],
       fixed_years: simulation_params[:fixed_years].to_i,
-      subsequent_rate_sub: (simulation_params[:subsequent_rate].to_f * 100).round
+      subsequent_rate: simulation_params[:subsequent_rate]
     )
 
     if active_prepayment?
