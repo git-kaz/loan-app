@@ -7,8 +7,8 @@ RSpec.describe "Api::V1::Simulations", type: :request do
         years: 35,
         repayment_type: 0,
         interest_type: 1,
-        initial_rate_sub: 70
-      }
+        initial_rate: 0.7
+    }
     end
 
   context "正常なパラメーターの場合" do
@@ -54,7 +54,7 @@ RSpec.describe "Api::V1::Simulations", type: :request do
       include_examples "422を返しエラーメッセージを返す"
     end
     context "金利がマイナスの場合" do
-      let(:invalid_params) { valid_params.merge(initial_rate_sub: -1) }
+      let(:invalid_params) { valid_params.merge(initial_rate: -0.7) }
       include_examples "422を返しエラーメッセージを返す"
     end
 
