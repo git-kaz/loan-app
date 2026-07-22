@@ -3,6 +3,9 @@
 import React from "react";
 import { Scenario } from "@/app/page"; // page.tsxから型定義をインポート
 
+const clamp = (val: number, min: number, max: number): number =>
+  Math.max(min, Math.min(max, val));
+
 interface ControlPanelProps {
   scenarios: Scenario[];
   activeScenarioIndex: number;
@@ -46,8 +49,9 @@ export default function ControlPanel({
       borderCard: "border-plan-c/30", // 🌟 静的スキャン可能な完全な枠線クラス
     },
   ];
-  
-  const currentAccent = planAccentClasses[activeScenarioIndex] || planAccentClasses[0];
+
+  const currentAccent =
+    planAccentClasses[activeScenarioIndex] || planAccentClasses[0];
 
   return (
     // 背景をご指定の#EEEEE9に映える純白（bg-white）にし、柔らかなボーダーと影を適用しました
@@ -58,7 +62,9 @@ export default function ControlPanel({
 
       {/* 編集プランの切り替えセレクター */}
       <div className="mb-6">
-        <label className="text-xs font-bold text-stone-500 block mb-2">編集するプラン</label>
+        <label className="text-xs font-bold text-stone-500 block mb-2">
+          編集するプラン
+        </label>
         <div className="flex gap-1 bg-stone-100 p-1 rounded-xl border border-stone-200">
           {scenarios.map((s, idx) => {
             const isActive = idx === activeScenarioIndex;
@@ -90,9 +96,23 @@ export default function ControlPanel({
         <div className="flex justify-between items-center mb-2">
           <label className="text-sm font-bold text-stone-600">借入金額</label>
           <div className="flex items-baseline gap-0.5">
-            <span className={`text-2xl font-extrabold ${currentAccent.text}`}>
-              {activeScenario.principal.toLocaleString()}
-            </span>
+            <input
+              type="number"
+              min={100}
+              max={10000}
+              step={100}
+              value={activeScenario.principal}
+              onChange={(e) =>
+                onChangeField("principal", Number(e.target.value))
+              }
+              onBlur={(e) =>
+                onChangeField(
+                  "principal",
+                  clamp(Number(e.target.value), 100, 10000),
+                )
+              }
+              className={`text-2xl font-extrabold ${currentAccent.text} w-24 text-right bg-transparent outline-none border-b-2 border-current/20 hover:border-current/50 focus:border-current transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+            />
             <span className="text-xs font-bold text-stone-500">万円</span>
           </div>
         </div>
@@ -117,7 +137,23 @@ export default function ControlPanel({
         <div className="flex justify-between items-center mb-2">
           <label className="text-sm font-bold text-stone-600">返済期間</label>
           <div className="flex items-baseline gap-0.5">
-            <span className={`text-2xl font-extrabold ${currentAccent.text}`}>{activeScenario.periodYears}</span>
+            <input
+              type="number"
+              min={1}
+              max={50}
+              step={1}
+              value={activeScenario.periodYears}
+              onChange={(e) =>
+                onChangeField("periodYears", Number(e.target.value))
+              }
+              onBlur={(e) =>
+                onChangeField(
+                  "periodYears",
+                  clamp(Number(e.target.value), 1, 50),
+                )
+              }
+              className={`text-2xl font-extrabold ${currentAccent.text} w-16 text-right bg-transparent outline-none border-b-2 border-current/20 hover:border-current/50 focus:border-current transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+            />
             <span className="text-xs font-bold text-stone-500">年</span>
           </div>
         </div>
@@ -138,7 +174,9 @@ export default function ControlPanel({
 
       {/* 3. 返済方法 (元利均等 / 元金均等) */}
       <div className="mb-6">
-        <label className="text-sm font-bold text-stone-600 block mb-2">返済方法</label>
+        <label className="text-sm font-bold text-stone-600 block mb-2">
+          返済方法
+        </label>
         <div className="grid grid-cols-2 gap-1 bg-stone-100 p-1 rounded-xl border border-stone-200">
           <button
             type="button"
@@ -167,7 +205,9 @@ export default function ControlPanel({
 
       {/* 4. 金利タイプ */}
       <div className="mb-6">
-        <label className="text-sm font-bold text-stone-600 block mb-2">金利タイプ</label>
+        <label className="text-sm font-bold text-stone-600 block mb-2">
+          金利タイプ
+        </label>
         <div className="grid grid-cols-3 gap-1 bg-stone-100 p-1 rounded-xl border border-stone-200">
           <button
             type="button"
@@ -206,16 +246,36 @@ export default function ControlPanel({
       </div>
 
       {/* 5. 金利条件設定 */}
-      
+
       {/* 5-A. 変動金利(0) または 全期間固定(1) の場合は、シンプルな金利スライダーを1つ表示 */}
-      {(activeScenario.interestType === 0 || activeScenario.interestType === 1) && (
-        <div className={`p-4 ${currentAccent.bgSubtle} border ${currentAccent.borderCard} rounded-2xl mb-6 transition-all`}>
+      {(activeScenario.interestType === 0 ||
+        activeScenario.interestType === 1) && (
+        <div
+          className={`p-4 ${currentAccent.bgSubtle} border ${currentAccent.borderCard} rounded-2xl mb-6 transition-all`}
+        >
           <div>
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs text-stone-600 font-bold">借入金利</span>
-              <span className="text-sm font-extrabold text-stone-800">
-                {activeScenario.initialRate.toFixed(2)} %
-              </span>
+              <div className="flex items-center gap-0.5">
+                <input
+                  type="number"
+                  min={0.1}
+                  max={10.0}
+                  step={0.05}
+                  value={activeScenario.initialRate}
+                  onChange={(e) =>
+                    onChangeField("initialRate", Number(e.target.value))
+                  }
+                  onBlur={(e) =>
+                    onChangeField(
+                      "initialRate",
+                      clamp(Number(e.target.value), 0.1, 10.0),
+                    )
+                  }
+                  className="text-sm font-extrabold text-stone-800 w-14 text-right bg-transparent outline-none border-b-2 border-stone-300/50 hover:border-stone-500 focus:border-stone-700 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+                <span className="text-sm font-extrabold text-stone-800">%</span>
+              </div>
             </div>
             <input
               type="range"
@@ -223,7 +283,9 @@ export default function ControlPanel({
               max="10.0"
               step="0.05"
               value={activeScenario.initialRate}
-              onChange={(e) => onChangeField("initialRate", Number(e.target.value))}
+              onChange={(e) =>
+                onChangeField("initialRate", Number(e.target.value))
+              }
               className={`w-full h-1.5 bg-white border border-stone-200 rounded-lg appearance-none cursor-pointer ${currentAccent.slider}`}
             />
           </div>
@@ -232,13 +294,32 @@ export default function ControlPanel({
 
       {/* 5-B. 当初固定(2) の場合は、3つの詳細スライダーを表示 */}
       {activeScenario.interestType === 2 && (
-        <div className={`p-4 ${currentAccent.bgSubtle} border ${currentAccent.borderCard} rounded-2xl mb-6 transition-all`}>
+        <div
+          className={`p-4 ${currentAccent.bgSubtle} border ${currentAccent.borderCard} rounded-2xl mb-6 transition-all`}
+        >
           <div className="mb-4">
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs text-stone-600 font-bold">当初金利</span>
-              <span className="text-sm font-extrabold text-stone-800">
-                {activeScenario.initialRate.toFixed(2)} %
-              </span>
+              <div className="flex items-center gap-0.5">
+                <input
+                  type="number"
+                  min={0.1}
+                  max={10.0}
+                  step={0.05}
+                  value={activeScenario.initialRate}
+                  onChange={(e) =>
+                    onChangeField("initialRate", Number(e.target.value))
+                  }
+                  onBlur={(e) =>
+                    onChangeField(
+                      "initialRate",
+                      clamp(Number(e.target.value), 0.1, 10.0),
+                    )
+                  }
+                  className="text-sm font-extrabold text-stone-800 w-14 text-right bg-transparent outline-none border-b-2 border-stone-300/50 hover:border-stone-500 focus:border-stone-700 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+                <span className="text-sm font-extrabold text-stone-800">%</span>
+              </div>
             </div>
             <input
               type="range"
@@ -246,17 +327,40 @@ export default function ControlPanel({
               max="5.0"
               step="0.05"
               value={activeScenario.initialRate}
-              onChange={(e) => onChangeField("initialRate", Number(e.target.value))}
+              onChange={(e) =>
+                onChangeField("initialRate", Number(e.target.value))
+              }
               className={`w-full h-1.5 bg-white border border-stone-200 rounded-lg appearance-none cursor-pointer ${currentAccent.slider}`}
             />
           </div>
 
           <div className="mb-4">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-xs text-stone-700 font-bold">当初固定期間</span>
-              <span className="text-sm font-extrabold text-stone-800">
-                {activeScenario.fixedYears} 年
+              <span className="text-xs text-stone-700 font-bold">
+                当初固定期間
               </span>
+              <div className="flex items-center gap-0.5">
+                <input
+                  type="number"
+                  min={1}
+                  max={20}
+                  step={1}
+                  value={activeScenario.fixedYears}
+                  onChange={(e) =>
+                    onChangeField("fixedYears", Number(e.target.value))
+                  }
+                  onBlur={(e) =>
+                    onChangeField(
+                      "fixedYears",
+                      clamp(Number(e.target.value), 1, 20),
+                    )
+                  }
+                  className="text-sm font-extrabold text-stone-800 w-10 text-right bg-transparent outline-none border-b-2 border-stone-300/50 hover:border-stone-500 focus:border-stone-700 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+                <span className="text-sm font-extrabold text-stone-800">
+                  年
+                </span>
+              </div>
             </div>
             <input
               type="range"
@@ -264,7 +368,9 @@ export default function ControlPanel({
               max="20"
               step="1"
               value={activeScenario.fixedYears}
-              onChange={(e) => onChangeField("fixedYears", Number(e.target.value))}
+              onChange={(e) =>
+                onChangeField("fixedYears", Number(e.target.value))
+              }
               className={`w-full h-1.5 bg-white border border-stone-200 rounded-lg appearance-none cursor-pointer ${currentAccent.slider}`}
             />
           </div>
@@ -274,9 +380,26 @@ export default function ControlPanel({
               <span className="text-xs text-stone-700 font-bold">
                 4年目以降の想定金利
               </span>
-              <span className="text-sm font-extrabold text-stone-800">
-                {activeScenario.subsequentRate.toFixed(2)} %
-              </span>
+              <div className="flex items-center gap-0.5">
+                <input
+                  type="number"
+                  min={0.1}
+                  max={10.0}
+                  step={0.05}
+                  value={activeScenario.subsequentRate}
+                  onChange={(e) =>
+                    onChangeField("subsequentRate", Number(e.target.value))
+                  }
+                  onBlur={(e) =>
+                    onChangeField(
+                      "subsequentRate",
+                      clamp(Number(e.target.value), 0.1, 10.0),
+                    )
+                  }
+                  className="text-sm font-extrabold text-stone-800 w-14 text-right bg-transparent outline-none border-b-2 border-stone-300/50 hover:border-stone-500 focus:border-stone-700 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+                <span className="text-sm font-extrabold text-stone-800">%</span>
+              </div>
             </div>
             <input
               type="range"
@@ -284,7 +407,9 @@ export default function ControlPanel({
               max="10.0"
               step="0.05"
               value={activeScenario.subsequentRate}
-              onChange={(e) => onChangeField("subsequentRate", Number(e.target.value))}
+              onChange={(e) =>
+                onChangeField("subsequentRate", Number(e.target.value))
+              }
               className={`w-full h-1.5 bg-white border border-stone-200 rounded-lg appearance-none cursor-pointer ${currentAccent.slider}`}
             />
           </div>
@@ -294,12 +419,21 @@ export default function ControlPanel({
       {/* 6. 繰り上げ返済シミュレーション */}
       <div className="border-t border-stone-200 pt-4">
         <div className="flex justify-between items-center">
-          <span className="text-sm font-bold text-stone-600">繰り上げ返済を追加</span>
+          <span className="text-sm font-bold text-stone-600">
+            繰り上げ返済を追加
+          </span>
           <button
             type="button"
-            onClick={() => onChangeField("prepaymentEnabled", !activeScenario.prepaymentEnabled)}
+            onClick={() =>
+              onChangeField(
+                "prepaymentEnabled",
+                !activeScenario.prepaymentEnabled,
+              )
+            }
             className={`w-11 h-6 rounded-full p-0.5 transition-all duration-200 focus:outline-none cursor-pointer flex items-center ${
-              activeScenario.prepaymentEnabled ? `${currentAccent.toggleActive} justify-end` : "bg-stone-300 justify-start"
+              activeScenario.prepaymentEnabled
+                ? `${currentAccent.toggleActive} justify-end`
+                : "bg-stone-300 justify-start"
             }`}
           >
             <span className="w-5 h-5 bg-white rounded-full shadow-md"></span>
@@ -311,7 +445,9 @@ export default function ControlPanel({
           <div className="mt-4 p-4 bg-stone-50 border border-stone-200 rounded-xl space-y-4 transition-all">
             {/* 繰上タイプ切り替え */}
             <div>
-              <label className="text-[10px] font-bold text-stone-500 block mb-1">返済方法</label>
+              <label className="text-[10px] font-bold text-stone-500 block mb-1">
+                返済方法
+              </label>
               <div className="grid grid-cols-2 gap-1 bg-stone-100 p-0.5 rounded-lg border border-stone-200">
                 <button
                   type="button"
@@ -341,8 +477,33 @@ export default function ControlPanel({
             {/* 繰上実行年 */}
             <div>
               <div className="flex justify-between items-center mb-1">
-                <span className="text-[10px] font-bold text-stone-500">繰上時期</span>
-                <span className="text-xs font-bold text-stone-800">{activeScenario.prepaymentYear} 年目</span>
+                <span className="text-[10px] font-bold text-stone-500">
+                  繰上時期
+                </span>
+                <div className="flex items-center gap-0.5">
+                  <input
+                    type="number"
+                    min={1}
+                    max={activeScenario.periodYears}
+                    step={1}
+                    value={activeScenario.prepaymentYear}
+                    onChange={(e) =>
+                      onChangeField("prepaymentYear", Number(e.target.value))
+                    }
+                    onBlur={(e) =>
+                      onChangeField(
+                        "prepaymentYear",
+                        clamp(
+                          Number(e.target.value),
+                          1,
+                          activeScenario.periodYears,
+                        ),
+                      )
+                    }
+                    className="text-xs font-bold text-stone-800 w-10 text-right bg-transparent outline-none border-b-2 border-stone-300/50 hover:border-stone-500 focus:border-stone-700 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <span className="text-xs font-bold text-stone-800">年目</span>
+                </div>
               </div>
               <input
                 type="range"
@@ -350,7 +511,9 @@ export default function ControlPanel({
                 max={activeScenario.periodYears}
                 step="1"
                 value={activeScenario.prepaymentYear}
-                onChange={(e) => onChangeField("prepaymentYear", Number(e.target.value))}
+                onChange={(e) =>
+                  onChangeField("prepaymentYear", Number(e.target.value))
+                }
                 className={`w-full h-2 bg-white border border-stone-200 rounded-lg appearance-none cursor-pointer ${currentAccent.slider}`}
               />
             </div>
@@ -358,8 +521,29 @@ export default function ControlPanel({
             {/* 繰上金額 */}
             <div>
               <div className="flex justify-between items-center mb-1">
-                <span className="text-[10px] font-bold text-stone-500">繰上金額</span>
-                <span className="text-xs font-bold text-stone-800">{activeScenario.prepaymentAmount} 万円</span>
+                <span className="text-[10px] font-bold text-stone-500">
+                  繰上金額
+                </span>
+                <div className="flex items-center gap-0.5">
+                  <input
+                    type="number"
+                    min={10}
+                    max={5000}
+                    step={10}
+                    value={activeScenario.prepaymentAmount}
+                    onChange={(e) =>
+                      onChangeField("prepaymentAmount", Number(e.target.value))
+                    }
+                    onBlur={(e) =>
+                      onChangeField(
+                        "prepaymentAmount",
+                        clamp(Number(e.target.value), 10, 5000),
+                      )
+                    }
+                    className="text-xs font-bold text-stone-800 w-14 text-right bg-transparent outline-none border-b-2 border-stone-300/50 hover:border-stone-500 focus:border-stone-700 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <span className="text-xs font-bold text-stone-800">万円</span>
+                </div>
               </div>
               <input
                 type="range"
@@ -367,7 +551,9 @@ export default function ControlPanel({
                 max="5000"
                 step="10"
                 value={activeScenario.prepaymentAmount}
-                onChange={(e) => onChangeField("prepaymentAmount", Number(e.target.value))}
+                onChange={(e) =>
+                  onChangeField("prepaymentAmount", Number(e.target.value))
+                }
                 className={`w-full h-2 bg-white border border-stone-200 rounded-lg appearance-none cursor-pointer ${currentAccent.slider}`}
               />
             </div>
