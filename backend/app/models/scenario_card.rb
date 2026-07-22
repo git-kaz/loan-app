@@ -141,34 +141,34 @@ class ScenarioCard < ApplicationRecord
       }
   end
 
-    private
-    # 月ごとの利息を計算
-    def calculate_monthly_interest(balance, rate_bps)
-      (balance * (rate_bps / (BPS_PER_PERCENT * MONTHS_PER_YEAR).to_f)).floor
+  private
+  # 月ごとの利息を計算
+  def calculate_monthly_interest(balance, rate_bps)
+    (balance * (rate_bps / (BPS_PER_PERCENT * MONTHS_PER_YEAR).to_f)).floor
+  end
+
+  # 元利均等返済の計算を行うヘルパーメソッド
+  def calculate_equal_payment(balance, months, annual_rate_bps)
+    # 金利が0%の場合は単に元金を月数で割る
+    return (balance / months.to_f).ceil if annual_rate_bps == 0
+
+    # 万分率の年利を月利(float)に変換
+    monthly_rate = annual_rate_bps / (BPS_PER_PERCENT * MONTHS_PER_YEAR).to_f
+
+    # 返済額の計算式：元金 * 月利 * (1 + 月利) ^ 月数 / ((1 + 月利) ^ 月数 - 1)
+    # 分子
+    numerator = balance * monthly_rate * ((1 + monthly_rate) ** months)
+    # 分母
+    denominator = (1 + monthly_rate) ** months - 1
+
+    (numerator / denominator).floor # 小数点以下切り捨て
+  end
+
+  def current_rate_bps_at(month)
+    if initial_fixed? && fixed_years.present? &&subsequent_rate_sub.present? && month > fixed_years * 12
+      subsequent_rate_sub
+    else
+      initial_rate_sub
     end
-
-    # 元利均等返済の計算を行うヘルパーメソッド
-    def calculate_equal_payment(balance, months, annual_rate_bps)
-      # 金利が0%の場合は単に元金を月数で割る
-      return (balance / months.to_f).ceil if annual_rate_bps == 0
-
-      # 万分率の年利を月利(float)に変換
-      monthly_rate = annual_rate_bps / (BPS_PER_PERCENT * MONTHS_PER_YEAR).to_f
-
-      # 返済額の計算式：元金 * 月利 * (1 + 月利) ^ 月数 / ((1 + 月利) ^ 月数 - 1)
-      # 分子
-      numerator = balance * monthly_rate * ((1 + monthly_rate) ** months)
-      # 分母
-      denominator = (1 + monthly_rate) ** months - 1
-
-      (numerator / denominator).floor # 小数点以下切り捨て
-    end
-
-    def current_rate_bps_at(month)
-      if initial_fixed? && fixed_years.present? &&subsequent_rate_sub.present? && month > fixed_years * 12
-        subsequent_rate_sub
-      else
-        initial_rate_sub
-      end
-    end
+  end
 end
