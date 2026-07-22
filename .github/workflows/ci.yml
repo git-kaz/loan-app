@@ -3,12 +3,14 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   scan_ruby:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: ./backend
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -20,12 +22,15 @@ jobs:
 
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bin/brakeman --no-pager
-      
+
       - name: Scan for known security vulnerabilities in gems used
         run: bin/bundler-audit
-      
+
   lint:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
     env:
       RUBOCOP_CACHE_ROOT: tmp/rubocop
     steps:
@@ -52,7 +57,9 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: ./backend
     services:
       postgres:
         image: postgres
@@ -80,11 +87,11 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-
+          working-directory: ./backend
       - name: Run tests
         env:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
           # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
           # REDIS_URL: redis://localhost:6379/0
-        run: bin/rails db:test:prepare test
+        run: bin/rails db:test:prepare && bundle exec rspec
