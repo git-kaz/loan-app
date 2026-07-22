@@ -66,6 +66,7 @@ class ScenarioCard < ApplicationRecord
 
     # メモリに繰り上げ返済データを読み込んでおく
     active_prepayments = prepayments.to_a
+    prepayment_map = active_prepayments.index_by { |p| p.execution_year * 12 }
 
     # 返済金額の計算
     (1..months).each do |m|
@@ -107,7 +108,8 @@ class ScenarioCard < ApplicationRecord
       end
 
       # 繰り上げ返済の実行判定と処理
-      prepayment = active_prepayments.find { |p| p.execution_year * 12 == m }
+      prepayment = prepayment_map[m]
+
       if prepayment && balance > 0
         prepay_amount = [ prepayment.amount, balance ].min
         balance -= prepay_amount
