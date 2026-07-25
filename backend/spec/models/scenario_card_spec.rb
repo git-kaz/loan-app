@@ -6,8 +6,8 @@ RSpec.describe ScenarioCard, type: :model do
       let(:scenario_card) do
         ScenarioCard.new(
           principal: 40_000_000, # 4000万円
-          period_years: 35, # 35年
-          repayment_type: 0, # 元利均等
+          period_years: 35,
+          repayment_type: 0,
           interest_type: 1, # 全期間固定
           initial_rate_sub: 70 # 金利0.7% (70 bps)
         )
@@ -156,6 +156,32 @@ RSpec.describe ScenarioCard, type: :model do
           expect(result[:chart_data][5]).to eq({ year: 6, payment: 104_327 })
         end
       end
+    end
+  end
+
+  describe '.build_from_params' do
+    let(:params) do
+      {
+        amount: '4000',
+        years: '35',
+        repayment_type: '0',
+        interest_type: '1',
+        initial_rate: '0.7',
+        fixed_years: '0',
+        subsequent_rate: '0',
+        prepayment_enabled: 'true',
+        prepayment_year: '5',
+        prepayment_amount: '100',
+        prepayment_type: '0'
+      }
+    end
+
+    it '万円単位のパラメーターが正しく円単位に変換されScenarioCardが作成されること' do
+      card = ScenarioCard.build_from_params(params)
+
+      expect(card.principal).to eq(40_000_000)
+      expect(card.period_years).to eq(35)
+      expect(card.prepayments.first.amount).to eq(1_000_000)
     end
   end
 end

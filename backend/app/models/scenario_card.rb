@@ -23,6 +23,28 @@ class ScenarioCard < ApplicationRecord
 
   validates_associated :prepayments
 
+  def self.build_from_params(params)
+    card = new(
+      principal: params[:amount].to_i * 10_000,
+      period_years: params[:years].to_i,
+      repayment_type: params[:repayment_type].to_i,
+      interest_type: params[:interest_type].to_i,
+      initial_rate: params[:initial_rate],
+      fixed_years: params[:fixed_years].to_i,
+      subsequent_rate: params[:subsequent_rate]
+    )
+
+    if ActiveModel::Type::Boolean.new.cast(params[:prepayment_enabled])
+      card.prepayments.build(
+      execution_year: params[:prepayment_year].to_i,
+      amount: params[:prepayment_amount].to_i * 10_000, # 万円→円に
+      prepayment_type: params[:prepayment_type].to_i
+    )
+    end
+
+    card # 作成したカードを返す
+  end
+
   # initial_rateをモデルで変換
   def initial_rate=(value)
     self.initial_rate_sub = value.present? ? (value.to_f * 100).round : nil
