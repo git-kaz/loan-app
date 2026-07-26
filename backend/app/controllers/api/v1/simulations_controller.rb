@@ -1,23 +1,6 @@
 class Api::V1::SimulationsController < ApplicationController
   def create
-    # 一時的な計算をメモリで行うためにnewを用いる
-    card = ScenarioCard.new(
-      principal: simulation_params[:amount].to_i * 10_000,
-      period_years: simulation_params[:years].to_i,
-      repayment_type: simulation_params[:repayment_type].to_i,
-      interest_type: simulation_params[:interest_type].to_i,
-      initial_rate: simulation_params[:initial_rate],
-      fixed_years: simulation_params[:fixed_years].to_i,
-      subsequent_rate: simulation_params[:subsequent_rate]
-    )
-
-    if active_prepayment?
-    card.prepayments.build(
-      execution_year: simulation_params[:prepayment_year].to_i,
-      amount: simulation_params[:prepayment_amount].to_i * 10_000, # 万円→円に
-      prepayment_type: simulation_params[:prepayment_type].to_i
-    )
-    end
+    card = ScenarioCard.build_from_params(simulation_params)
 
     if card.invalid?
       render json: { errors: card.errors.full_messages }, status: :unprocessable_entity

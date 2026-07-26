@@ -72,11 +72,10 @@ export default function ControlPanel({
                 key={s.id}
                 type="button"
                 onClick={() => setActiveScenarioIndex(idx)}
-                className={`flex-1 py-2 text-xs rounded-lg transition-all cursor-pointer border border-transparent ${
-                  isActive
-                    ? tabColors[idx]
-                    : "text-stone-500 hover:text-stone-800 font-medium"
-                }`}
+                className={`flex-1 py-2 text-xs rounded-lg transition-all cursor-pointer border border-transparent ${isActive
+                  ? tabColors[idx]
+                  : "text-stone-500 hover:text-stone-800 font-medium"
+                  }`}
               >
                 {s.name}
               </button>
@@ -89,6 +88,12 @@ export default function ControlPanel({
       <SliderWithInput
         label="借入金額"
         value={activeScenario.principal}
+        tooltipContent={
+          <div>
+            <p className="font-bold mb-1">借入金額とは</p>
+            <p>銀行から借りる住宅ローンの総額を万円単位で入力します</p>
+          </div>
+        }
         min={100}
         max={10000}
         step={100}
@@ -119,22 +124,20 @@ export default function ControlPanel({
           <button
             type="button"
             onClick={() => onChangeField("repaymentType", 0)}
-            className={`py-2 text-xs rounded-lg transition-all cursor-pointer border border-transparent ${
-              activeScenario.repaymentType === 0
-                ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
-                : "text-stone-500 hover:text-stone-850 font-medium"
-            }`}
+            className={`py-2 text-xs rounded-lg transition-all cursor-pointer border border-transparent ${activeScenario.repaymentType === 0
+              ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
+              : "text-stone-500 hover:text-stone-850 font-medium"
+              }`}
           >
             元利均等
           </button>
           <button
             type="button"
             onClick={() => onChangeField("repaymentType", 1)}
-            className={`py-2 text-xs rounded-lg transition-all cursor-pointer border border-transparent ${
-              activeScenario.repaymentType === 1
-                ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
-                : "text-stone-500 hover:text-stone-850 font-medium"
-            }`}
+            className={`py-2 text-xs rounded-lg transition-all cursor-pointer border border-transparent ${activeScenario.repaymentType === 1
+              ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
+              : "text-stone-500 hover:text-stone-850 font-medium"
+              }`}
           >
             元金均等
           </button>
@@ -150,33 +153,30 @@ export default function ControlPanel({
           <button
             type="button"
             onClick={() => onChangeField("interestType", 0)}
-            className={`py-2 text-[10px] rounded-lg transition-all cursor-pointer border border-transparent ${
-              activeScenario.interestType === 0
-                ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
-                : "text-stone-500 hover:text-stone-850 font-medium"
-            }`}
+            className={`py-2 text-[10px] rounded-lg transition-all cursor-pointer border border-transparent ${activeScenario.interestType === 0
+              ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
+              : "text-stone-500 hover:text-stone-850 font-medium"
+              }`}
           >
             変動金利
           </button>
           <button
             type="button"
             onClick={() => onChangeField("interestType", 1)}
-            className={`py-2 text-[10px] rounded-lg transition-all cursor-pointer border border-transparent ${
-              activeScenario.interestType === 1
-                ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
-                : "text-stone-500 hover:text-stone-850 font-medium"
-            }`}
+            className={`py-2 text-[10px] rounded-lg transition-all cursor-pointer border border-transparent ${activeScenario.interestType === 1
+              ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
+              : "text-stone-500 hover:text-stone-850 font-medium"
+              }`}
           >
             全期間固定
           </button>
           <button
             type="button"
             onClick={() => onChangeField("interestType", 2)}
-            className={`py-2 text-[10px] rounded-lg transition-all cursor-pointer border border-transparent ${
-              activeScenario.interestType === 2
-                ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
-                : "text-stone-500 hover:text-stone-850 font-medium"
-            }`}
+            className={`py-2 text-[10px] rounded-lg transition-all cursor-pointer border border-transparent ${activeScenario.interestType === 2
+              ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
+              : "text-stone-500 hover:text-stone-850 font-medium"
+              }`}
           >
             当初固定
           </button>
@@ -188,21 +188,21 @@ export default function ControlPanel({
       {/* 5-A. 変動金利(0) または 全期間固定(1) の場合は、シンプルな金利スライダーを1つ表示 */}
       {(activeScenario.interestType === 0 ||
         activeScenario.interestType === 1) && (
-        <div
-          className={`p-4 ${currentAccent.bgSubtle} border ${currentAccent.borderCard} rounded-2xl mb-6 transition-all`}
-        >
-          <SliderWithInput
-            label="借入金利"
-            value={activeScenario.initialRate}
-            min={0.1}
-            max={10.0}
-            step={0.05}
-            unit="%"
-            onChange={(v) => onChangeField("initialRate", v)}
-            accentClass={currentAccent}
-          />
-        </div>
-      )}
+          <div
+            className={`p-4 ${currentAccent.bgSubtle} border ${currentAccent.borderCard} rounded-2xl mb-6 transition-all`}
+          >
+            <SliderWithInput
+              label="借入金利"
+              value={activeScenario.initialRate}
+              min={0.1}
+              max={10.0}
+              step={0.05}
+              unit="%"
+              onChange={(v) => onChangeField("initialRate", v)}
+              accentClass={currentAccent}
+            />
+          </div>
+        )}
 
       {/* 5-B. 当初固定(2) の場合は、3つの詳細スライダーを表示 */}
       {activeScenario.interestType === 2 && (
@@ -257,11 +257,10 @@ export default function ControlPanel({
                 !activeScenario.prepaymentEnabled,
               )
             }
-            className={`w-11 h-6 rounded-full p-0.5 transition-all duration-200 focus:outline-none cursor-pointer flex items-center ${
-              activeScenario.prepaymentEnabled
-                ? `${currentAccent.toggleActive} justify-end`
-                : "bg-stone-300 justify-start"
-            }`}
+            className={`w-11 h-6 rounded-full p-0.5 transition-all duration-200 focus:outline-none cursor-pointer flex items-center ${activeScenario.prepaymentEnabled
+              ? `${currentAccent.toggleActive} justify-end`
+              : "bg-stone-300 justify-start"
+              }`}
           >
             <span className="w-5 h-5 bg-white rounded-full shadow-md"></span>
           </button>
@@ -279,22 +278,20 @@ export default function ControlPanel({
                 <button
                   type="button"
                   onClick={() => onChangeField("prepaymentType", 0)}
-                  className={`py-1 text-[10px] rounded-md transition-all cursor-pointer border border-transparent ${
-                    activeScenario.prepaymentType === 0
-                      ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
-                      : "text-stone-500 hover:text-stone-800 font-medium"
-                  }`}
+                  className={`py-1 text-[10px] rounded-md transition-all cursor-pointer border border-transparent ${activeScenario.prepaymentType === 0
+                    ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
+                    : "text-stone-500 hover:text-stone-800 font-medium"
+                    }`}
                 >
                   期間短縮
                 </button>
                 <button
                   type="button"
                   onClick={() => onChangeField("prepaymentType", 1)}
-                  className={`py-1 text-[10px] rounded-md transition-all cursor-pointer border border-transparent ${
-                    activeScenario.prepaymentType === 1
-                      ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
-                      : "text-stone-500 hover:text-stone-800 font-medium"
-                  }`}
+                  className={`py-1 text-[10px] rounded-md transition-all cursor-pointer border border-transparent ${activeScenario.prepaymentType === 1
+                    ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
+                    : "text-stone-500 hover:text-stone-800 font-medium"
+                    }`}
                 >
                   返済額軽減
                 </button>

@@ -1,9 +1,11 @@
 "use client";
 
 import React from "react";
+import HelpTooltip from "./HelpTooltip";
 
 interface SliderWithInputProps {
   label: string;
+  tooltipContent?: React.ReactNode;
   value: number;
   min: number;
   max: number;
@@ -19,6 +21,7 @@ const clamp = (val: number, min: number, max: number): number =>
 
 export default function SliderWithInput({
   label,
+  tooltipContent,
   value,
   min,
   max,
@@ -38,7 +41,10 @@ export default function SliderWithInput({
   return (
     <div className="mb-6">
       <div className="flex justify-between items-center mb-2">
-        <label className="text-sm font-bold text-stone-600">{label}</label>
+        <div className="flex items-center">
+          <label className="text-sm font-bold text-stone-600">{label}</label>
+          {tooltipContent && <HelpTooltip>{tooltipContent}</HelpTooltip>}
+        </div>
         <div className="flex items-baseline gap-0.5">
           <input
             type="number"

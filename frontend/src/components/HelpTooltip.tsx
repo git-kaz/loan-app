@@ -4,7 +4,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-export function HelpTooltip({ children }: Props) {
+export default function HelpTooltip({ children }: Props) {
   return (
     <div className='relative group inline-block ml-1'>
       <button
