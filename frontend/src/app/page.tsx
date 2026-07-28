@@ -185,7 +185,6 @@ export default function Home() {
 
   //
   return (
-    // クリーンなライトブルーからホワイトへのグラデーション背景
     <main className="min-h-screen bg-background p-8 flex items-start justify-center">
       <div className="w-full max-w-6xl flex flex-col gap-6">
         <header
@@ -204,11 +203,9 @@ export default function Home() {
               />
             </div>
             <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-2">
-              {/* 美しいグラデーションのかかったタイトル */}
               <h1 className="text-3xl font-black tracking-tight font-sans text-stone-600">
                 LoanSchumy
               </h1>
-              {/* 優しいフォントのサブタイトル */}
               <span className="text-sm font-medium text-stone-500 font-sans tracking-wide">
                 住宅ローン比較シミュレーター
               </span>
@@ -240,8 +237,8 @@ export default function Home() {
               loading={loading}
             />
 
-            {/* 右下段：Rechartsグラフが入るプレースホルダー */}
-            <div className="flex items-center justify-center border border-dashed border-slate-200 rounded-3xl h-[420px] text-slate-400 bg-white/50 backdrop-blur-sm shadow-sm">
+            {/* 右下段：Rechartsグラフ */}
+            <div className="flex items-center justify-center border border-stone-200 rounded-3xl h-[420px] bg-white/70 backdrop-blur-sm shadow-md shadow-stone-200/40">
               <TimelineChart chartData={chartData} scenarios={scenarios} />
             </div>
           </div>
