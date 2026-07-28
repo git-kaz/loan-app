@@ -66,7 +66,7 @@ export default function SliderWithInput({
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className={`w-full h-2 bg-stone-100 border border-stone-200 rounded-lg appearance-none cursor-pointer ${accentClass.slider}`}
+        className={`w-full h-2 bg-stone-50 border border-stone-200 rounded-lg appearance-none cursor-pointer ${accentClass.slider}`}
       />
     </div>
   );

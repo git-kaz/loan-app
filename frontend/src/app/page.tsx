@@ -237,8 +237,8 @@ export default function Home() {
               loading={loading}
             />
 
-            {/* 右下段：Rechartsグラフが入るプレースホルダー */}
-            <div className="flex items-center justify-center border border-dashed border-slate-200 rounded-3xl h-[420px] text-slate-400 bg-white/50 backdrop-blur-sm shadow-sm">
+            {/* 右下段：Rechartsグラフ */}
+            <div className="flex items-center justify-center border border-stone-200 rounded-3xl h-[420px] bg-white/70 backdrop-blur-sm shadow-md shadow-stone-200/40">
               <TimelineChart chartData={chartData} scenarios={scenarios} />
             </div>
           </div>
