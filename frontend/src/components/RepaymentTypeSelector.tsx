@@ -54,7 +54,7 @@ export default function RepaymentTypeSelector({
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
 
