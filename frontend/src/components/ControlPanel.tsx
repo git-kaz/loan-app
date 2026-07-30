@@ -4,6 +4,10 @@ import React from "react";
 import { Scenario } from "@/app/page"; // page.tsxから型定義をインポート
 import SliderWithInput from "./SliderWithInput";
 import HelpTooltip from "./HelpTooltip";
+import ScenarioTabSelector from "./ScenarioTabSelector";
+import RepaymentTypeSelector from "./RepaymentTypeSelector";
+import InterestSection from "./InterestSection";
+import PrepaymentSection from "./PrepaymentSection";
 
 interface ControlPanelProps {
   scenarios: Scenario[];
@@ -56,35 +60,11 @@ export default function ControlPanel({
       </h2>
 
       {/* 編集プランの切り替えセレクター */}
-      <div className="mb-6">
-        <label className="text-xs font-bold text-stone-500 block mb-2">
-          編集するプラン
-        </label>
-        <div className="flex gap-1 bg-stone-100 p-1 rounded-xl border border-stone-200">
-          {scenarios.map((s, idx) => {
-            const isActive = idx === activeScenarioIndex;
-            const tabColors = [
-              "bg-plan-a text-white border-plan-a shadow-sm font-bold",
-              "bg-plan-b text-white border-plan-b shadow-sm font-bold",
-              "bg-plan-c text-white border-plan-c shadow-sm font-bold",
-            ];
-            return (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => setActiveScenarioIndex(idx)}
-                className={`flex-1 py-2 text-xs rounded-lg transition-all cursor-pointer border border-transparent ${isActive
-                  ? tabColors[idx]
-                  : "text-stone-500 hover:text-stone-800 font-medium"
-                  }`}
-              >
-                {s.name}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
+      <ScenarioTabSelector
+        scenarios={scenarios}
+        activeScenarioIndex={activeScenarioIndex}
+        setActiveScenarioIndex={setActiveScenarioIndex}
+      />
       {/* 1. 借入金額 */}
       <SliderWithInput
         label="借入金額"
@@ -124,287 +104,24 @@ export default function ControlPanel({
       />
 
       {/* 3. 返済方法 (元利均等 / 元金均等) */}
-      <div className="mb-6">
-        <div className="flex items-center mb-2">
-          <label className="text-sm font-bold text-stone-600 block mb-2">
-            返済方法
-          </label>
-          <HelpTooltip>
-            <div>
-              <p className="font-bold mb-1">返済方法について</p>
-              <p className="mb-1"><strong>元利均等：</strong>
-                毎月の返済額が一定で計画が立てやすい方式です</p>
-              <p><strong>元金均等：</strong>
-                返済当初の返済額は高めですが、元金の減りが早い方式です</p>
-            </div>
-          </HelpTooltip>
-        </div>
-        <div className="grid grid-cols-2 gap-1 bg-stone-100 p-1 rounded-xl border border-stone-200">
-          <button
-            type="button"
-            onClick={() => onChangeField("repaymentType", 0)}
-            className={`py-2 text-xs rounded-lg transition-all cursor-pointer border border-transparent ${activeScenario.repaymentType === 0
-              ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
-              : "text-stone-500 hover:text-stone-850 font-medium"
-              }`}
-          >
-            元利均等
-          </button>
-          <button
-            type="button"
-            onClick={() => onChangeField("repaymentType", 1)}
-            className={`py-2 text-xs rounded-lg transition-all cursor-pointer border border-transparent ${activeScenario.repaymentType === 1
-              ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
-              : "text-stone-500 hover:text-stone-850 font-medium"
-              }`}
-          >
-            元金均等
-          </button>
-        </div>
-      </div>
+      <RepaymentTypeSelector
+        repaymentType={activeScenario.repaymentType}
+        onChangeField={onChangeField}
+        currentAccent={currentAccent}
+      />
+      {/* 4. 金利タイプ、条件設定 */}
+      <InterestSection
+        activeScenario={activeScenario}
+        onChangeField={onChangeField}
+        currentAccent={currentAccent}
+      />
 
-      {/* 4. 金利タイプ */}
-      <div className="mb-6">
-        <div className="flex items-center mb-2">
-          <label className="text-sm font-bold text-stone-600 block mb-2">
-            金利タイプ
-          </label>
-          <HelpTooltip>
-            <div>
-              <p className="font-bold mb-1">金利タイプについて</p>
-              <p className="mb-1"><strong>変動金利：</strong>
-                金利が低めですが金額が変動する可能性があります</p>
-              <p className="mb-1"><strong>全期間固定：</strong>
-                金利が高めですが、完済まで金利が固定されます</p>
-              <p className="mb-1"><strong>当初固定：</strong>
-                任意の期間のみ金利が固定されます</p>
-            </div>
-          </HelpTooltip>
-        </div>
-        <div className="grid grid-cols-3 gap-1 bg-stone-100 p-1 rounded-xl border border-stone-200 mb-4">
-          <button
-            type="button"
-            onClick={() => onChangeField("interestType", 0)}
-            className={`py-2 text-xs rounded-lg transition-all cursor-pointer border border-transparent ${activeScenario.interestType === 0
-              ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
-              : "text-stone-500 hover:text-stone-850 font-medium"
-              }`}
-          >
-            変動金利
-          </button>
-          <button
-            type="button"
-            onClick={() => onChangeField("interestType", 1)}
-            className={`py-2 text-xs rounded-lg transition-all cursor-pointer border border-transparent ${activeScenario.interestType === 1
-              ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
-              : "text-stone-500 hover:text-stone-850 font-medium"
-              }`}
-          >
-            全期間固定
-          </button>
-          <button
-            type="button"
-            onClick={() => onChangeField("interestType", 2)}
-            className={`py-2 text-xs rounded-lg transition-all cursor-pointer border border-transparent ${activeScenario.interestType === 2
-              ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
-              : "text-stone-500 hover:text-stone-850 font-medium"
-              }`}
-          >
-            当初固定
-          </button>
-        </div>
-
-        {/* 5. 金利条件設定 */}
-
-        {/* 5-A. 変動金利(0) または 全期間固定(1) の場合は、シンプルな金利スライダーを1つ表示 */}
-        {(activeScenario.interestType === 0 ||
-          activeScenario.interestType === 1) && (
-            <div
-              className={`p-2 ${currentAccent.bgSubtle} border ${currentAccent.borderCard} rounded-2xl mb-6 transition-all`}
-            >
-              <SliderWithInput
-                label="借入金利"
-                value={activeScenario.initialRate}
-                tooltipContent={
-                  <div>
-                    <p className="font-bold mb-1">借入金利とは</p>
-                    <p>各金融機関により異なります。複数を比較して検討しましょう</p>
-                  </div>
-                }
-
-                min={0.1}
-                max={10.0}
-                step={0.05}
-                unit="%"
-                onChange={(v) => onChangeField("initialRate", v)}
-                accentClass={currentAccent}
-                size="lg"
-              />
-            </div>
-          )}
-
-        {/* 5-B. 当初固定(2) の場合は、3つの詳細スライダーを表示 */}
-        {activeScenario.interestType === 2 && (
-          <div
-            className={`p-4 ${currentAccent.bgSubtle} border ${currentAccent.borderCard} rounded-2xl mb-6 transition-all`}
-          >
-            <SliderWithInput
-              label="当初金利"
-              value={activeScenario.initialRate}
-              tooltipContent={
-                <div>
-                  <p className="font-bold mb-1">当初金利とは</p>
-                  <p>任意の年数固定される金利です</p>
-                </div>
-              }
-
-              min={0.1}
-              max={10.0}
-              step={0.05}
-              unit="%"
-              onChange={(v) => onChangeField("initialRate", v)}
-              accentClass={currentAccent}
-            />
-
-            <SliderWithInput
-              label="当初固定期間"
-              value={activeScenario.fixedYears}
-              tooltipContent={
-                <div>
-                  <p className="font-bold mb-1">当初固定期間とは</p>
-                  <p>金利が固定される年数です。年数が長いほど金利は高くなります</p>
-                </div>
-              }
-
-              min={1}
-              max={20}
-              step={1}
-              unit="年"
-              onChange={(v) => onChangeField("fixedYears", v)}
-              accentClass={currentAccent}
-            />
-            <SliderWithInput
-              label="固定期間以降の金利"
-              value={activeScenario.subsequentRate}
-              min={0.1}
-              max={10.0}
-              step={0.05}
-              unit="%"
-              onChange={(v) => onChangeField("subsequentRate", v)}
-              accentClass={currentAccent}
-            />
-          </div>
-        )}
-
-        {/* 6. 繰り上げ返済シミュレーション */}
-        <div className="border-t border-stone-200 pt-4">
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-bold text-stone-600">
-              繰り上げ返済を追加
-            </span>
-            <button
-              type="button"
-              onClick={() =>
-                onChangeField(
-                  "prepaymentEnabled",
-                  !activeScenario.prepaymentEnabled,
-                )
-              }
-              className={`w-11 h-6 rounded-full p-0.5 transition-all duration-200 focus:outline-none cursor-pointer flex items-center ${activeScenario.prepaymentEnabled
-                ? `${currentAccent.toggleActive} justify-end`
-                : "bg-stone-300 justify-start"
-                }`}
-            >
-              <span className="w-5 h-5 bg-white rounded-full shadow-md"></span>
-            </button>
-          </div>
-
-          {/* 繰り上げ返済の設定エリア */}
-          {activeScenario.prepaymentEnabled && (
-            <div className="mt-4 p-4 bg-stone-50 border border-stone-200 rounded-xl space-y-4 transition-all">
-              {/* 繰上タイプ切り替え */}
-              <div className="mb-4">
-                <div className="flex items-center mb-2">
-                  <label className="text-sm font-bold text-stone-500 block mb-1">
-                    返済方法
-                  </label>
-                  <HelpTooltip>
-                    <div>
-                      <p className="font-bold mb-1">返済方法について</p>
-                      <p className="mb-1"><strong>期間短縮：</strong>
-                        月々の返済額を変えずに期間を短縮します</p>
-                      <p><strong>返済額軽減：</strong>
-                        月々の返済額が減りますが、総支払額は期間短縮より多くなります</p>
-                    </div>
-                  </HelpTooltip>
-                  <div className="px-4 grid grid-cols-2 gap-1 bg-stone-100 p-0.5 rounded-lg border border-stone-200">
-                    <button
-                      type="button"
-                      onClick={() => onChangeField("prepaymentType", 0)}
-                      className={`py-1 text-sm rounded-md transition-all cursor-pointer border border-transparent ${activeScenario.prepaymentType === 0
-                        ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
-                        : "text-stone-500 hover:text-stone-800 font-medium"
-                        }`}
-                    >
-                      期間短縮
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onChangeField("prepaymentType", 1)}
-                      className={`py-1 text-sm rounded-md transition-all cursor-pointer border border-transparent ${activeScenario.prepaymentType === 1
-                        ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
-                        : "text-stone-500 hover:text-stone-800 font-medium"
-                        }`}
-                    >
-                      返済額軽減
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* 繰上実行年 */}
-              <div>
-                <SliderWithInput
-                  label="繰上時期"
-                  value={activeScenario.prepaymentYear}
-                  tooltipContent={
-                    <div>
-                      <p className="font-bold mb-1">繰上時期とは</p>
-                      <p>借入から何年後に返済するかを入力します</p>
-                    </div>
-                  }
-
-                  min={1}
-                  max={activeScenario.periodYears}
-                  step={1}
-                  unit="年目"
-                  onChange={(v) => onChangeField("prepaymentYear", v)}
-                  accentClass={currentAccent}
-                />
-              </div>
-
-              {/* 繰上金額 */}
-              <SliderWithInput
-                label="繰上金額"
-                value={activeScenario.prepaymentAmount}
-                tooltipContent={
-                  <div>
-                    <p className="font-bold mb-1">繰上金額とは</p>
-                    <p>一括でまとめて返済することで返済額を軽減します</p>
-                  </div>
-                }
-
-                min={10}
-                max={5000}
-                step={10}
-                unit="万円"
-                onChange={(v) => onChangeField("prepaymentAmount", v)}
-                accentClass={currentAccent}
-              />
-            </div>
-          )}
-        </div>
-      </div>
+      {/* 6. 繰上返済設定 */}
+      <PrepaymentSection
+        activeScenario={activeScenario}
+        onChangeField={onChangeField}
+        currentAccent={currentAccent}
+      />
     </div >
   );
 }
