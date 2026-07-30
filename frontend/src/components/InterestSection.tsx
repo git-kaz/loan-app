@@ -5,7 +5,7 @@ import { Scenario } from "@/app/page";
 import SliderWithInput from "./SliderWithInput";
 import HelpTooltip from "./HelpTooltip";
 
-interface InterestRateSectionProps {
+interface InterestSectionProps {
   activeScenario: Scenario;
   onChangeField: (field: keyof Scenario, value: any) => void;
   currentAccent: any;
@@ -15,9 +15,59 @@ export default function InterestRateSection({
   activeScenario,
   onChangeField,
   currentAccent
-}: InterestRateSectionProps) {
+}: InterestSectionProps) {
   return (
     <>
+      <div className="mb-6">
+        <div className="flex items-center mb-2">
+          <label className="text-sm font-bold text-stone-600 block mb-2">
+            金利タイプ
+          </label>
+          <HelpTooltip>
+            <div>
+              <p className="font-bold mb-1">金利タイプについて</p>
+              <p className="mb-1"><strong>変動金利：</strong>
+                金利が低めですが金額が変動する可能性があります</p>
+              <p className="mb-1"><strong>全期間固定：</strong>
+                金利が高めですが、完済まで金利が固定されます</p>
+              <p className="mb-1"><strong>当初固定：</strong>
+                任意の期間のみ金利が固定されます</p>
+            </div>
+          </HelpTooltip>
+        </div>
+        <div className="grid grid-cols-3 gap-1 bg-stone-100 p-1 rounded-xl border border-stone-200 mb-4">
+          <button
+            type="button"
+            onClick={() => onChangeField("interestType", 0)}
+            className={`py-2 text-xs rounded-lg transition-all cursor-pointer border border-transparent ${activeScenario.interestType === 0
+              ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
+              : "text-stone-500 hover:text-stone-850 font-medium"
+              }`}
+          >
+            変動金利
+          </button>
+          <button
+            type="button"
+            onClick={() => onChangeField("interestType", 1)}
+            className={`py-2 text-xs rounded-lg transition-all cursor-pointer border border-transparent ${activeScenario.interestType === 1
+              ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
+              : "text-stone-500 hover:text-stone-850 font-medium"
+              }`}
+          >
+            全期間固定
+          </button>
+          <button
+            type="button"
+            onClick={() => onChangeField("interestType", 2)}
+            className={`py-2 text-xs rounded-lg transition-all cursor-pointer border border-transparent ${activeScenario.interestType === 2
+              ? `bg-white ${currentAccent.text} font-bold shadow-sm border border-stone-200`
+              : "text-stone-500 hover:text-stone-850 font-medium"
+              }`}
+          >
+            当初固定
+          </button>
+        </div>
+      </div>
       {
         (activeScenario.interestType === 0 ||
           activeScenario.interestType === 1) && (
