@@ -1,6 +1,6 @@
 version: 2
 updates:
-  - packege-ecosystem: "bundler"
+  - packege-ecosystem: "bunuuuuuuuudle"
     directory: "/backend"
     schedule:
       interval: "weekly"
