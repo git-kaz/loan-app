@@ -1,35 +1,35 @@
 version: 2
 updates:
-  - packege-ecosystem: "bunuuuuuuuudle"
+  - package-ecosystem: "bundler"
     directory: "/backend"
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "9:00"
+      time: "09:00"
       timezone: "Asia/Tokyo"
     open-pull-requests-limit: 10
     labels:
       - "dependencies"
       - "backend"
 
-  - packege-ecosystem: "npm"
+  - package-ecosystem: "npm"
     directory: "/frontend"
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "9:00"
+      time: "09:00"
       timezone: "Asia/Tokyo"
     open-pull-requests-limit: 10
     labels:
       - "dependencies"
       - "end"
 
-  - packege-ecosystem: "github-actions"
+  - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "9:00"
+      time: "09:00"
       timezone: "Asia/Tokyo"
     open-pull-requests-limit: 10
     labels:
