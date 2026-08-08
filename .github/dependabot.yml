@@ -24,7 +24,7 @@ updates:
       - "dependencies"
       - "end"
 
-  - packege-ecosystem: "githuhb-actions"
+  - packege-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
