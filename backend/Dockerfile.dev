@@ -6,7 +6,7 @@ ENV LANG C.UTF-8
 ENV TZ Asia/Tokyo
 
 # 必要なパッケージのインストール（RailsはAPIモードのみのため、Node.js/Yarnは不要）
-RUN apt-get update -qq && apt-get install -y build-essential libpq-dev git vim curl
+RUN apt-get update -qq && apt-get install -y build-essential libpq-dev libvips git vim curl
  
 # アプリケーションディレクトリの作成
 RUN mkdir /myapp
